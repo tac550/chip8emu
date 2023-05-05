@@ -31,6 +31,15 @@ impl Chip8State {
         let lo = self.memory[(addr + 1) as usize];
         lo as u16 | ((hi as u16) << 8)
     }
+
+    fn decrement_timers(&mut self) {
+        if self.dt > 0 {
+            self.dt -= 1;
+        }
+        if self.st > 0 {
+            self.st -= 1;
+        }
+    }
 }
 
 #[no_mangle]
@@ -50,8 +59,27 @@ mod tests {
     #[test]
     fn test_read_instruction() {
         let mut state = Chip8State::default();
+
         state.memory[0x0] = 0x12;
         state.memory[0x1] = 0x34;
+        
         assert_eq!(state.read_instruction(0x0), 0x1234);
+    }
+
+    #[test]
+    fn test_decrement_timers() {
+        let mut state = Chip8State::default();
+
+        state.dt = 1;
+        state.st = 10;
+        state.decrement_timers();
+
+        assert_eq!((state.dt, state.st), (0, 9));
+
+        for _ in 0..10 {
+            state.decrement_timers();
+        }
+
+        assert_eq!((state.dt, state.st), (0, 0))
     }
 }
