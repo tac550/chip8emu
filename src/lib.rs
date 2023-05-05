@@ -1,12 +1,12 @@
 #[repr(C)]
 pub struct Chip8State {
-    left: i32,
-    right: i32,
+    left: u8,
+    right: u8,
 }
 
 #[no_mangle]
-pub extern "C" fn chip8_add(state: Chip8State) -> i32 {
-    state.left + state.right
+pub extern "C" fn chip8_add(state: &mut Chip8State) -> i32 {
+    (state.left + state.right).into()
 }
 
 #[cfg(test)]
@@ -15,8 +15,8 @@ mod tests {
 
     #[test]
     fn test_chip8_add() {
-        let state = Chip8State {left: 2, right: 2};
-        let result = chip8_add(state);
+        let mut state = Chip8State {left: 2, right: 2};
+        let result = chip8_add(&mut state);
         assert_eq!(result, 4);
     }
 }
