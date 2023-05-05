@@ -3,6 +3,8 @@ pub struct Chip8State {
     left: u8,
     right: u8,
     total: u8,
+
+    memory: [u8; 4096],
 }
 
 #[no_mangle]
@@ -17,7 +19,7 @@ mod tests {
 
     #[test]
     fn test_chip8_add() {
-        let mut state = Chip8State {left: 2, right: 2, total: 0};
+        let mut state = Chip8State {left: 2, right: 2, total: 0, memory: [0; 4096]};
         chip8_add(&mut state);
         assert_eq!(state.total, 4);
     }
