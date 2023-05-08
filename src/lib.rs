@@ -29,7 +29,7 @@ impl Chip8State {
         let addr = addr % 4096;
         let hi = self.memory[addr as usize];
         let lo = self.memory[(addr + 1) as usize];
-        lo as u16 | ((hi as u16) << 8)
+        u16::from(lo) | (u16::from(hi) << 8)
     }
 
     fn decrement_timers(&mut self) {
@@ -85,7 +85,7 @@ const fn shl_or(val: u8, shift: usize, def: u8) -> u8 {
 
 #[no_mangle]
 pub extern "C" fn chip8_tick(state: &mut Chip8State) -> i32 {
-    state.read_instruction(0x0) as i32
+    i32::from(state.read_instruction(0x0))
 }
 
 #[cfg(test)]
