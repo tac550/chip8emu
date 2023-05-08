@@ -60,7 +60,7 @@ impl Chip8State {
             let second_index = first_index + 1;
 
             let left_pixels = pixels >> x_offset;
-            let right_pixels = shl_or(pixels, 8 - x_offset, 0);
+            let right_pixels = shl_no(pixels, 8 - x_offset);
             let left_oldval = self.framebuffer[first_index];
             let right_oldval = self.framebuffer[second_index];
 
@@ -79,8 +79,8 @@ impl Chip8State {
 }
 
 /// Shift left without risk of overflow errors
-const fn shl_or(val: u8, shift: usize, def: u8) -> u8 {
-    [val << (shift & 7), def][((shift & !7) != 0) as usize]
+const fn shl_no(val: u8, shift: usize) -> u8 {
+    [val << (shift & 7), 0][((shift & !7) != 0) as usize]
 }
 
 #[no_mangle]
@@ -125,9 +125,9 @@ mod tests {
     }
 
     #[test]
-    fn test_shl_or() {
-        assert_eq!(shl_or(5, 6, 0), 64);
-        assert_eq!(shl_or(5, 8, 0), 0)
+    fn test_shl_no() {
+        assert_eq!(shl_no(5, 6), 64);
+        assert_eq!(shl_no(5, 8), 0)
     }
     
     #[test]
