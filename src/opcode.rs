@@ -35,7 +35,7 @@ pub enum Opcode {
     SUB(Reg, Reg),
     /// Set VF = lsb Vx; Set Vx = Vx >> 1
     SHR(Reg),
-    /// Set VF = Vy . Vx; Set Vx = Vy - Vx
+    /// Set VF = Vy > Vx; Set Vx = Vy - Vx
     SUBN(Reg, Reg),
     /// Set VF = msb Vx; Set Vx = Vx << 1
     SHL(Reg),
