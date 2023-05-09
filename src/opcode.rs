@@ -1,6 +1,7 @@
 use crate::Reg;
 
 #[allow(clippy::upper_case_acronyms)]
+#[derive(Debug, PartialEq)]
 pub enum Opcode {
     /// Clear the display
     CLS,
@@ -70,11 +71,23 @@ pub enum Opcode {
     LDIV(Reg),
     /// Fill V0 to Vx with values from memory starting at address I; Set I = I + x + 1
     LDVI(Reg),
+    /// No operation
+    NOP,
 }
 
 impl From<u16> for Opcode {
     fn from(value: u16) -> Self {
-        todo!()
+        match value {
+            0x00E0 => Self::CLS,
+            0x00EE => Self::RET,
+            0x1000..=0x1FFF => Self::JP(value & 0x0FFF),
+            0x2000..=0x2FFF => Self::CALL(value & 0x0FFF),
+            0x3000..=0x3FFF => Self::SEVB(Reg::from(((value & 0x0F00) >> 8) as u8), (value & 0x00FF) as u8),
+            0x4000..=0x4FFF => Self::SNEVB(Reg::from(((value & 0x0F00) >> 8) as u8), (value & 0x00FF) as u8),
+            0x5000..=0x5FFF => Self::SEVV(Reg::from(((value & 0x0F00) >> 8) as u8), Reg::from(((value & 0x00F0) >> 4) as u8)),
+            0x6000..=0x6FFF => Self::LDVB(Reg::from(((value & 0x0F00) >> 8) as u8), (value & 0x00FF) as u8),
+            _ => Self::NOP,
+        }
     }
 }
 
@@ -82,4 +95,15 @@ impl From<u16> for Opcode {
 mod tests {
     use super::*;
 
+    #[test]
+    fn test_opcode_from_u16() {
+        assert_eq!(Opcode::from(0x00E0), Opcode::CLS);
+        assert_eq!(Opcode::from(0x00EE), Opcode::RET);
+        assert_eq!(Opcode::from(0x1FFF), Opcode::JP(0x0FFF));
+        assert_eq!(Opcode::from(0x2123), Opcode::CALL(0x0123));
+        assert_eq!(Opcode::from(0x35AB), Opcode::SEVB(Reg::V5, 0xAB));
+        assert_eq!(Opcode::from(0x4F12), Opcode::SNEVB(Reg::VF, 0x12));
+        assert_eq!(Opcode::from(0x5010), Opcode::SEVV(Reg::V0, Reg::V1));
+        assert_eq!(Opcode::from(0x6AEE), Opcode::LDVB(Reg::VA, 0xEE));
+    }
 }

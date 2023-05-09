@@ -1,9 +1,21 @@
 mod opcode;
 
 /// For conveniently accessing registers in a 16-byte buffer
+#[derive(Debug, PartialEq)]
 pub enum Reg {
     V0 = 0, V1 = 1, V2 = 2, V3 = 3, V4 = 4, V5 = 5, V6 = 6, V7 = 7,
     V8 = 8, V9 = 9, VA = 10, VB = 11, VC = 12, VD = 13, VE = 14, VF = 15,
+}
+
+impl From<u8> for Reg {
+    fn from(value: u8) -> Self {
+        match value & 0x0F {
+            0 => Self::V0, 1 => Self::V1, 2 => Self::V2, 3 => Self::V3,
+            4 => Self::V4, 5 => Self::V5, 6 => Self::V6, 7 => Self::V7,
+            8 => Self::V8, 9 => Self::V9, 10 => Self::VA, 11 => Self::VB,
+            12 => Self::VC, 13 => Self::VD, 14 => Self::VE, _ => Self::VF,
+        }
+    }
 }
 
 #[repr(C)]
