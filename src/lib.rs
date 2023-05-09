@@ -34,7 +34,9 @@ pub struct Chip8State {
 
 impl Default for Chip8State {
     fn default() -> Self {
-        Self { registers: Default::default(), index: Default::default(), stack: [0; 64], sp: Default::default(), pc: Default::default(), dt: Default::default(), st: Default::default(), framebuffer: [0; 256], memory: [0; 4096] }
+        Self { registers: Default::default(), index: Default::default(), stack: [0; 64],
+            sp: Default::default(), pc: Default::default(), dt: Default::default(),
+            st: Default::default(), framebuffer: [0; 256], memory: [0; 4096] }
     }
 }
 
