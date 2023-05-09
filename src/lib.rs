@@ -104,6 +104,19 @@ impl Chip8State {
             oldval & pixels != 0
         }
     }
+
+    /// Store the provided BCD value at three contiguous memory addresses, beginning at the provided memory address.
+    /// 
+    /// # Arguments
+    ///
+    /// * `address` - Only the first 12 bits are used to identify the first destination address.
+    fn store_bcd(&mut self, bcd: util::BCD, address: u16) {
+        let address = address & 0x0FFF;
+
+        self.store_to_memory(bcd.hundreds, address);
+        self.store_to_memory(bcd.tens, address + 1);
+        self.store_to_memory(bcd.ones, address + 2);
+    }
 }
 
 #[no_mangle]
@@ -185,5 +198,31 @@ mod tests {
         assert_eq!(state.framebuffer[1], 0xF8);
         assert_eq!(state.framebuffer[87], 0x1F);
         assert_eq!(state.framebuffer[88], 0x00)
+    }
+
+    #[test]
+    fn test_store_bcd() {
+        let mut state = Chip8State::default();
+
+        state.store_bcd(util::BCD::new(1, 2, 3), 0x0FFC);
+        state.store_bcd(util::BCD::new(2, 5, 5), 0x1234);
+        state.store_bcd(util::BCD::new(0, 7, 8), 0x089F);
+        state.store_bcd(util::BCD::new(1, 9, 9), 0xFFFF);
+
+        assert_eq!(state.memory[0x0FFC], 1);
+        assert_eq!(state.memory[0x0FFD], 2);
+        assert_eq!(state.memory[0x0FFE], 3);
+
+        assert_eq!(state.memory[0x0234], 2);
+        assert_eq!(state.memory[0x0235], 5);
+        assert_eq!(state.memory[0x0236], 5);
+
+        assert_eq!(state.memory[0x089F], 0);
+        assert_eq!(state.memory[0x08A0], 7);
+        assert_eq!(state.memory[0x08A1], 8);
+
+        assert_eq!(state.memory[0x0FFF], 1);
+        assert_eq!(state.memory[0x0000], 9);
+        assert_eq!(state.memory[0x0001], 9);
     }
 }
