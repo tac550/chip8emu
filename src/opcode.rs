@@ -86,6 +86,47 @@ impl From<u16> for Opcode {
             0x4000..=0x4FFF => Self::SNEVB(Reg::from(((value & 0x0F00) >> 8) as u8), (value & 0x00FF) as u8),
             0x5000..=0x5FFF => Self::SEVV(Reg::from(((value & 0x0F00) >> 8) as u8), Reg::from(((value & 0x00F0) >> 4) as u8)),
             0x6000..=0x6FFF => Self::LDVB(Reg::from(((value & 0x0F00) >> 8) as u8), (value & 0x00FF) as u8),
+            0x7000..=0x7FFF => Self::ADDVB(Reg::from(((value & 0x0F00) >> 8) as u8), (value & 0x00FF) as u8),
+            0x8000..=0x8FFF => {
+                match value & 0x000F {
+                    0x0 => Self::LDVV(Reg::from(((value & 0x0F00) >> 8) as u8), Reg::from(((value & 0x00F0) >> 4) as u8)),
+                    0x1 => Self::ORVV(Reg::from(((value & 0x0F00) >> 8) as u8), Reg::from(((value & 0x00F0) >> 4) as u8)),
+                    0x2 => Self::ANDVV(Reg::from(((value & 0x0F00) >> 8) as u8), Reg::from(((value & 0x00F0) >> 4) as u8)),
+                    0x3 => Self::XORVV(Reg::from(((value & 0x0F00) >> 8) as u8), Reg::from(((value & 0x00F0) >> 4) as u8)),
+                    0x4 => Self::ADDVV(Reg::from(((value & 0x0F00) >> 8) as u8), Reg::from(((value & 0x00F0) >> 4) as u8)),
+                    0x5 => Self::SUB(Reg::from(((value & 0x0F00) >> 8) as u8), Reg::from(((value & 0x00F0) >> 4) as u8)),
+                    0x6 => Self::SHR(Reg::from(((value & 0x0F00) >> 8) as u8)),
+                    0x7 => Self::SUBN(Reg::from(((value & 0x0F00) >> 8) as u8), Reg::from(((value & 0x00F0) >> 4) as u8)),
+                    0xE => Self::SHL(Reg::from(((value & 0x0F00) >> 8) as u8)),
+                    _ => Self::NOP,
+                }
+            },
+            0x9000..=0x9FFF => Self::SNEVV(Reg::from(((value & 0x0F00) >> 8) as u8), Reg::from(((value & 0x00F0) >> 4) as u8)),
+            0xA000..=0xAFFF => Self::LDI(value & 0x0FFF),
+            0xB000..=0xBFFF => Self::JPV0(value & 0x0FFF),
+            0xC000..=0xCFFF => Self::RND(Reg::from(((value & 0x0F00) >> 8) as u8), (value & 0x00FF) as u8),
+            0xD000..=0xDFFF => Self::DRW(Reg::from(((value & 0x0F00) >> 8) as u8), Reg::from(((value & 0x00F0) >> 4) as u8), (value & 0x000F) as u8),
+            0xE000..=0xEFFF => {
+                match value & 0x00FF {
+                    0x009E => Self::SKP(Reg::from(((value & 0x0F00) >> 8) as u8)),
+                    0x00A1 => Self::SKNP(Reg::from(((value & 0x0F00) >> 8) as u8)),
+                    _ => Self::NOP,
+                }
+            },
+            0xF000..=0xFFFF => {
+                match value & 0x00FF {
+                    0x0007 => Self::LDVDT(Reg::from(((value & 0x0F00) >> 8) as u8)),
+                    0x000A => Self::LDVK(Reg::from(((value & 0x0F00) >> 8) as u8)),
+                    0x0015 => Self::LDDT(Reg::from(((value & 0x0F00) >> 8) as u8)),
+                    0x0018 => Self::LDST(Reg::from(((value & 0x0F00) >> 8) as u8)),
+                    0x001E => Self::ADDI(Reg::from(((value & 0x0F00) >> 8) as u8)),
+                    0x0029 => Self::LDF(Reg::from(((value & 0x0F00) >> 8) as u8)),
+                    0x0033 => Self::LDB(Reg::from(((value & 0x0F00) >> 8) as u8)),
+                    0x0055 => Self::LDIV(Reg::from(((value & 0x0F00) >> 8) as u8)),
+                    0x0065 => Self::LDVI(Reg::from(((value & 0x0F00) >> 8) as u8)),
+                    _ => Self::NOP,
+                }
+            },
             _ => Self::NOP,
         }
     }
@@ -105,5 +146,31 @@ mod tests {
         assert_eq!(Opcode::from(0x4F12), Opcode::SNEVB(Reg::VF, 0x12));
         assert_eq!(Opcode::from(0x5010), Opcode::SEVV(Reg::V0, Reg::V1));
         assert_eq!(Opcode::from(0x6AEE), Opcode::LDVB(Reg::VA, 0xEE));
+        assert_eq!(Opcode::from(0x7F42), Opcode::ADDVB(Reg::VF, 0x42));
+        assert_eq!(Opcode::from(0x89A0), Opcode::LDVV(Reg::V9, Reg::VA));
+        assert_eq!(Opcode::from(0x8CD1), Opcode::ORVV(Reg::VC, Reg::VD));
+        assert_eq!(Opcode::from(0x8322), Opcode::ANDVV(Reg::V3, Reg::V2));
+        assert_eq!(Opcode::from(0x8773), Opcode::XORVV(Reg::V7, Reg::V7));
+        assert_eq!(Opcode::from(0x8004), Opcode::ADDVV(Reg::V0, Reg::V0));
+        assert_eq!(Opcode::from(0x8FE5), Opcode::SUB(Reg::VF, Reg::VE));
+        assert_eq!(Opcode::from(0x8AB6), Opcode::SHR(Reg::VA));
+        assert_eq!(Opcode::from(0x8AB7), Opcode::SUBN(Reg::VA, Reg::VB));
+        assert_eq!(Opcode::from(0x844E), Opcode::SHL(Reg::V4));
+        assert_eq!(Opcode::from(0x9560), Opcode::SNEVV(Reg::V5, Reg::V6));
+        assert_eq!(Opcode::from(0xA380), Opcode::LDI(0x0380));
+        assert_eq!(Opcode::from(0xB747), Opcode::JPV0(0x0747));
+        assert_eq!(Opcode::from(0xC172), Opcode::RND(Reg::V1, 0x72));
+        assert_eq!(Opcode::from(0xD789), Opcode::DRW(Reg::V7, Reg::V8, 0x09));
+        assert_eq!(Opcode::from(0xE89E), Opcode::SKP(Reg::V8));
+        assert_eq!(Opcode::from(0xE9A1), Opcode::SKNP(Reg::V9));
+        assert_eq!(Opcode::from(0xFF07), Opcode::LDVDT(Reg::VF));
+        assert_eq!(Opcode::from(0xF00A), Opcode::LDVK(Reg::V0));
+        assert_eq!(Opcode::from(0xF115), Opcode::LDDT(Reg::V1));
+        assert_eq!(Opcode::from(0xF218), Opcode::LDST(Reg::V2));
+        assert_eq!(Opcode::from(0xF31E), Opcode::ADDI(Reg::V3));
+        assert_eq!(Opcode::from(0xF429), Opcode::LDF(Reg::V4));
+        assert_eq!(Opcode::from(0xF533), Opcode::LDB(Reg::V5));
+        assert_eq!(Opcode::from(0xF655), Opcode::LDIV(Reg::V6));
+        assert_eq!(Opcode::from(0xF765), Opcode::LDVI(Reg::V7));
     }
 }
