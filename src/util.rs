@@ -23,6 +23,12 @@ impl From<u8> for BCD {
     }
 }
 
+impl BCD {
+    pub fn new(hundreds: u8, tens: u8, ones: u8) -> Self {
+        Self { hundreds, tens, ones }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -35,11 +41,11 @@ mod tests {
 
     #[test]
     fn test_u8_to_bcd() {
-        assert_eq!(BCD::from(0), BCD {hundreds: 0, tens: 0, ones: 0});
-        assert_eq!(BCD::from(5), BCD {hundreds: 0, tens: 0, ones: 5});
-        assert_eq!(BCD::from(50), BCD {hundreds: 0, tens: 5, ones: 0});
-        assert_eq!(BCD::from(255), BCD {hundreds: 2, tens: 5, ones: 5});
-        assert_eq!(BCD::from(202), BCD {hundreds: 2, tens: 0, ones: 2});
-        assert_eq!(BCD::from(123), BCD {hundreds: 1, tens: 2, ones: 3})
+        assert_eq!(BCD::from(0), BCD::new(0, 0, 0));
+        assert_eq!(BCD::from(5), BCD::new(0, 0, 5));
+        assert_eq!(BCD::from(50), BCD::new(0, 5, 0));
+        assert_eq!(BCD::from(255), BCD::new(2, 5, 5));
+        assert_eq!(BCD::from(202), BCD::new(2, 0, 2));
+        assert_eq!(BCD::from(123), BCD::new(1, 2, 3))
     }
 }
