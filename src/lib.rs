@@ -58,6 +58,17 @@ impl Chip8State {
         }
     }
 
+    /// Store the provided byte value at the provided memory address.
+    /// 
+    /// # Arguments
+    ///
+    /// * `address` - Only the first 12 bits are used to identify the destination address.
+    fn store_to_memory(&mut self, value: u8, address: u16) {
+        let address = address & 0x0FFF;
+
+        self.memory[address as usize] = value;
+    }
+
     /// XORs one byte to the framebuffer at specified location.
     /// Returns true if any active bit was overwritten.
     /// 
@@ -134,6 +145,19 @@ mod tests {
         }
 
         assert_eq!((state.dt, state.st), (0, 0))
+    }
+
+    #[test]
+    fn test_store_to_memory() {
+        let mut state = Chip8State::default();
+
+        state.store_to_memory(0xFF, 0x0000);
+        state.store_to_memory(0x01, 0x0ABC);
+        state.store_to_memory(0xAB, 0xFFFF);
+
+        assert_eq!(state.memory[0x0000], 0xFF);
+        assert_eq!(state.memory[0x0ABC], 0x01);
+        assert_eq!(state.memory[0x0FFF], 0xAB)
     }
     
     #[test]
