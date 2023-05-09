@@ -171,6 +171,6 @@ mod tests {
         assert_eq!(Opcode::from(0xF429), Opcode::LDF(Reg::V4));
         assert_eq!(Opcode::from(0xF533), Opcode::LDB(Reg::V5));
         assert_eq!(Opcode::from(0xF655), Opcode::LDIV(Reg::V6));
-        assert_eq!(Opcode::from(0xF765), Opcode::LDVI(Reg::V7));
+        assert_eq!(Opcode::from(0xF765), Opcode::LDVI(Reg::V7))
     }
 }
