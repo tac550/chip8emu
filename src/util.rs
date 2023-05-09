@@ -3,6 +3,7 @@ pub const fn shl_no(val: u8, shift: usize) -> u8 {
     [val << (shift & 7), 0][((shift & !7) != 0) as usize]
 }
 
+#[allow(clippy::upper_case_acronyms)]
 #[derive(Debug, PartialEq)]
 pub struct BCD {
     hundreds: u8,
