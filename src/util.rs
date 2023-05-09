@@ -6,9 +6,9 @@ pub const fn shl_no(val: u8, shift: usize) -> u8 {
 #[allow(clippy::upper_case_acronyms)]
 #[derive(Debug, PartialEq)]
 pub struct BCD {
-    hundreds: u8,
-    tens: u8,
-    ones: u8,
+    pub hundreds: u8,
+    pub tens: u8,
+    pub ones: u8,
 }
 
 impl From<u8> for BCD {
