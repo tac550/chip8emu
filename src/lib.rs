@@ -1,5 +1,6 @@
 mod opcode;
 mod util;
+mod sprite;
 
 /// For conveniently accessing registers in a 16-byte buffer
 #[derive(Debug, PartialEq)]
@@ -42,6 +43,10 @@ impl Default for Chip8State {
 }
 
 impl Chip8State {
+    fn init_char_sprites(&mut self) {
+        sprite::store_default_sprites(self);
+    }
+
     fn read_instruction(&self, addr: u16) -> u16 {
         let addr = addr % 4096;
         let hi = self.memory[addr as usize];
@@ -122,6 +127,13 @@ impl Chip8State {
 #[no_mangle]
 pub extern "C" fn chip8_tick(state: &mut Chip8State) -> i32 {
     i32::from(state.read_instruction(0x0))
+}
+
+#[no_mangle]
+pub extern "C" fn chip8_init(state: &mut Chip8State) {
+    state.init_char_sprites();
+
+    state.pc = 0x0200;
 }
 
 #[cfg(test)]
