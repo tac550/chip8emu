@@ -43,8 +43,10 @@ impl Default for Chip8State {
 }
 
 impl Chip8State {
-    fn init_char_sprites(&mut self) {
+    fn init(&mut self) {
         sprite::store_default_sprites(self);
+
+        self.pc = 0x0200;
     }
 
     fn read_instruction(&self, addr: u16) -> u16 {
@@ -137,9 +139,7 @@ pub extern "C" fn chip8_tick(state: &mut Chip8State) -> i32 {
 
 #[no_mangle]
 pub extern "C" fn chip8_init(state: &mut Chip8State) {
-    state.init_char_sprites();
-
-    state.pc = 0x0200;
+    state.init();
 }
 
 #[cfg(test)]
