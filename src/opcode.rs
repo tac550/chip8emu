@@ -1,4 +1,4 @@
-use crate::Reg;
+use crate::{Reg, Chip8State};
 
 #[allow(clippy::upper_case_acronyms)]
 #[derive(Debug, PartialEq)]
@@ -132,6 +132,48 @@ impl From<u16> for Opcode {
     }
 }
 
+impl Opcode {
+    fn execute(&self, state: &mut Chip8State) {
+        match self {
+            Opcode::CLS => state.framebuffer.fill(0),
+            Opcode::RET => todo!(),
+            Opcode::JP(_) => todo!(),
+            Opcode::CALL(_) => todo!(),
+            Opcode::SEVB(_, _) => todo!(),
+            Opcode::SNEVB(_, _) => todo!(),
+            Opcode::SEVV(_, _) => todo!(),
+            Opcode::LDVB(_, _) => todo!(),
+            Opcode::ADDVB(_, _) => todo!(),
+            Opcode::LDVV(_, _) => todo!(),
+            Opcode::ORVV(_, _) => todo!(),
+            Opcode::ANDVV(_, _) => todo!(),
+            Opcode::XORVV(_, _) => todo!(),
+            Opcode::ADDVV(_, _) => todo!(),
+            Opcode::SUB(_, _) => todo!(),
+            Opcode::SHR(_) => todo!(),
+            Opcode::SUBN(_, _) => todo!(),
+            Opcode::SHL(_) => todo!(),
+            Opcode::SNEVV(_, _) => todo!(),
+            Opcode::LDI(_) => todo!(),
+            Opcode::JPV0(_) => todo!(),
+            Opcode::RND(_, _) => todo!(),
+            Opcode::DRW(_, _, _) => todo!(),
+            Opcode::SKP(_) => todo!(),
+            Opcode::SKNP(_) => todo!(),
+            Opcode::LDVDT(_) => todo!(),
+            Opcode::LDVK(_) => todo!(),
+            Opcode::LDDT(_) => todo!(),
+            Opcode::LDST(_) => todo!(),
+            Opcode::ADDI(_) => todo!(),
+            Opcode::LDF(_) => todo!(),
+            Opcode::LDB(_) => todo!(),
+            Opcode::LDIV(_) => todo!(),
+            Opcode::LDVI(_) => todo!(),
+            Opcode::NOP => todo!(),
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -172,5 +214,20 @@ mod tests {
         assert_eq!(Opcode::from(0xF533), Opcode::LDB(Reg::V5));
         assert_eq!(Opcode::from(0xF655), Opcode::LDIV(Reg::V6));
         assert_eq!(Opcode::from(0xF765), Opcode::LDVI(Reg::V7))
+    }
+
+    #[test]
+    fn test_op_cls() {
+        let mut state = Chip8State::default();
+
+        state.framebuffer[0x12] = 0xFF;
+        state.framebuffer[0x00] = 0xAB;
+        state.framebuffer[0xFF] = 0xCD;
+
+        Opcode::CLS.execute(&mut state);
+
+        assert_eq!(state.framebuffer[0x12], 0x00);
+        assert_eq!(state.framebuffer[0x00], 0x00);
+        assert_eq!(state.framebuffer[0xFF], 0x00)
     }
 }
