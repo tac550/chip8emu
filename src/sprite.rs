@@ -6,6 +6,7 @@ pub struct DefSprite {
     rows: [u8; DEF_SPRITE_HEIGHT],
 }
 
+#[allow(clippy::unreadable_literal)]
 static DEFAULT_SPRITES: &[DefSprite] = &[
     DefSprite {
         rows: [
