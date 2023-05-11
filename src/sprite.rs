@@ -2,13 +2,13 @@ use crate::Chip8State;
 
 const DEF_SPRITE_HEIGHT: usize = 5;
 
-pub struct DefSprite {
+pub struct DefaultSize {
     rows: [u8; DEF_SPRITE_HEIGHT],
 }
 
 #[allow(clippy::unreadable_literal)]
-static DEFAULT_SPRITES: &[DefSprite] = &[
-    DefSprite {
+static DEFAULT_SPRITES: &[DefaultSize] = &[
+    DefaultSize {
         rows: [
             0b11110000,
             0b10010000,
@@ -17,7 +17,7 @@ static DEFAULT_SPRITES: &[DefSprite] = &[
             0b11110000,
         ],
     },
-    DefSprite {
+    DefaultSize {
         rows: [
             0b00100000,
             0b01100000,
@@ -26,7 +26,7 @@ static DEFAULT_SPRITES: &[DefSprite] = &[
             0b01110000,
         ],
     },
-    DefSprite {
+    DefaultSize {
         rows: [
             0b11110000,
             0b00010000,
@@ -35,7 +35,7 @@ static DEFAULT_SPRITES: &[DefSprite] = &[
             0b11110000,
         ],
     },
-    DefSprite {
+    DefaultSize {
         rows: [
             0b11110000,
             0b00010000,
@@ -44,7 +44,7 @@ static DEFAULT_SPRITES: &[DefSprite] = &[
             0b11110000,
         ],
     },
-    DefSprite {
+    DefaultSize {
         rows: [
             0b10010000,
             0b10010000,
@@ -53,7 +53,7 @@ static DEFAULT_SPRITES: &[DefSprite] = &[
             0b00010000,
         ],
     },
-    DefSprite {
+    DefaultSize {
         rows: [
             0b11110000,
             0b10010000,
@@ -62,7 +62,7 @@ static DEFAULT_SPRITES: &[DefSprite] = &[
             0b11110000,
         ],
     },
-    DefSprite {
+    DefaultSize {
         rows: [
             0b11110000,
             0b00010000,
@@ -71,7 +71,7 @@ static DEFAULT_SPRITES: &[DefSprite] = &[
             0b01000000,
         ],
     },
-    DefSprite {
+    DefaultSize {
         rows: [
             0b11110000,
             0b10010000,
@@ -80,7 +80,7 @@ static DEFAULT_SPRITES: &[DefSprite] = &[
             0b11110000,
         ],
     },
-    DefSprite {
+    DefaultSize {
         rows: [
             0b11110000,
             0b10010000,
@@ -89,7 +89,7 @@ static DEFAULT_SPRITES: &[DefSprite] = &[
             0b11110000,
         ],
     },
-    DefSprite {
+    DefaultSize {
         rows: [
             0b11110000,
             0b10010000,
@@ -98,7 +98,7 @@ static DEFAULT_SPRITES: &[DefSprite] = &[
             0b10010000,
         ],
     },
-    DefSprite {
+    DefaultSize {
         rows: [
             0b11100000,
             0b10010000,
@@ -107,7 +107,7 @@ static DEFAULT_SPRITES: &[DefSprite] = &[
             0b11100000,
         ],
     },
-    DefSprite {
+    DefaultSize {
         rows: [
             0b11110000,
             0b10000000,
@@ -116,7 +116,7 @@ static DEFAULT_SPRITES: &[DefSprite] = &[
             0b11110000,
         ],
     },
-    DefSprite {
+    DefaultSize {
         rows: [
             0b11100000,
             0b10010000,
@@ -125,7 +125,7 @@ static DEFAULT_SPRITES: &[DefSprite] = &[
             0b11100000,
         ],
     },
-    DefSprite {
+    DefaultSize {
         rows: [
             0b11110000,
             0b10000000,
@@ -134,7 +134,7 @@ static DEFAULT_SPRITES: &[DefSprite] = &[
             0b11110000,
         ],
     },
-    DefSprite {
+    DefaultSize {
         rows: [
             0b11110000,
             0b10000000,
