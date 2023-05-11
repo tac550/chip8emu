@@ -169,7 +169,7 @@ mod tests {
         assert_eq!(state.pc, 0x0321);
 
         state.jump_to_address(0xF777);
-        assert_eq!(state.pc, 0x0777);
+        assert_eq!(state.pc, 0x0777)
     }
 
     #[test]
@@ -252,6 +252,6 @@ mod tests {
 
         assert_eq!(state.memory[0x0FFF], 1);
         assert_eq!(state.memory[0x0000], 9);
-        assert_eq!(state.memory[0x0001], 9);
+        assert_eq!(state.memory[0x0001], 9)
     }
 }
