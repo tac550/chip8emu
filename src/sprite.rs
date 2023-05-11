@@ -155,9 +155,9 @@ static DEFAULT_SPRITES: &[DefaultSize; 16] = &[
 ];
 
 pub fn store_default_sprites(state: &mut Chip8State) {
-    for s in 0..16 {
+    for (s, sprite) in DEFAULT_SPRITES.iter().enumerate() {
         for i in 0..DEF_SPRITE_HEIGHT {
-            state.memory[s * DEF_SPRITE_HEIGHT + i] = DEFAULT_SPRITES[s].rows[i];
+            state.memory[s * DEF_SPRITE_HEIGHT + i] = sprite.rows[i];
         }
     }
 }
