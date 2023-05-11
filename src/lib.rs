@@ -52,7 +52,7 @@ impl Chip8State {
         self.pc = 0x0200;
     }
 
-    fn read_instruction(&self, addr: u16) -> u16 {
+    fn fetch_instruction(&self, addr: u16) -> u16 {
         let addr = addr % 4096;
         let hi = self.memory[addr as usize];
         let lo = self.memory[(addr + 1) as usize];
@@ -137,7 +137,7 @@ impl Chip8State {
 
 #[no_mangle]
 pub extern "C" fn chip8_tick(state: &mut Chip8State) -> i32 {
-    i32::from(state.read_instruction(0x0))
+    i32::from(state.fetch_instruction(0x0))
 }
 
 #[no_mangle]
@@ -155,7 +155,7 @@ mod tests {
     }
 
     #[test]
-    fn test_read_instruction() {
+    fn test_fetch_instruction() {
         let mut state = Chip8State::default();
 
         state.memory[0x0] = 0x12;
@@ -164,8 +164,8 @@ mod tests {
         state.memory[0xFFE] = 0x43;
         state.memory[0xFFF] = 0x21;
         
-        assert_eq!(state.read_instruction(0x0), 0x1234);
-        assert_eq!(state.read_instruction(0xFFE), 0x4321)
+        assert_eq!(state.fetch_instruction(0x0), 0x1234);
+        assert_eq!(state.fetch_instruction(0xFFE), 0x4321)
     }
 
     #[test]
