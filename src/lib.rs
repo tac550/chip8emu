@@ -158,7 +158,11 @@ mod tests {
         state.memory[0x0] = 0x12;
         state.memory[0x1] = 0x34;
         
+        state.memory[0xFFE] = 0x43;
+        state.memory[0xFFF] = 0x21;
+        
         assert_eq!(state.read_instruction(0x0), 0x1234);
+        assert_eq!(state.read_instruction(0xFFE), 0x4321)
     }
 
     #[test]
