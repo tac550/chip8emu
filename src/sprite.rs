@@ -7,7 +7,7 @@ pub struct DefaultSize {
 }
 
 #[allow(clippy::unreadable_literal)]
-static DEFAULT_SPRITES: &[DefaultSize] = &[
+static DEFAULT_SPRITES: &[DefaultSize; 16] = &[
     DefaultSize {
         rows: [
             0b11110000,
