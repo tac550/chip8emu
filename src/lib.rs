@@ -54,6 +54,12 @@ impl Chip8State {
         u16::from(lo) | (u16::from(hi) << 8)
     }
 
+    fn jump_to_address(&mut self, address: u16) {
+        let address = address & 0x0FFF;
+
+        self.pc = address;
+    }
+
     fn decrement_timers(&mut self) {
         if self.dt > 0 {
             self.dt -= 1;
@@ -153,6 +159,17 @@ mod tests {
         state.memory[0x1] = 0x34;
         
         assert_eq!(state.read_instruction(0x0), 0x1234);
+    }
+
+    #[test]
+    fn test_jump_to_address() {
+        let mut state = Chip8State::default();
+
+        state.jump_to_address(0x0321);
+        assert_eq!(state.pc, 0x0321);
+
+        state.jump_to_address(0xF777);
+        assert_eq!(state.pc, 0x0777);
     }
 
     #[test]
