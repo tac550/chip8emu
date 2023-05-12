@@ -176,7 +176,7 @@ impl Opcode {
                 state.registers[Reg::VF as usize] = (state.registers[*reg as usize] & 0x80) >> 7;
                 state.registers[*reg as usize] <<= 1;
             },
-            Opcode::SNEVV(_, _) => todo!(),
+            Opcode::SNEVV(reg1, reg2) => if state.registers[*reg1 as usize] != state.registers[*reg2 as usize] { state.pc += u16::from(INSTR_SIZE) },
             Opcode::LDI(_) => todo!(),
             Opcode::JPV0(_) => todo!(),
             Opcode::RND(_, _) => todo!(),
@@ -492,5 +492,19 @@ mod tests {
 
         assert_eq!(state.registers[Reg::VE as usize], 0xFE);
         assert_eq!(state.registers[Reg::VF as usize], 0x00)
+    }
+
+    #[test]
+    fn test_op_snevv() {
+        let mut state = Chip8State::default();
+
+        state.registers[Reg::V0 as usize] = 0x78;
+        state.registers[Reg::V2 as usize] = 0x78;
+
+        Opcode::SNEVV(Reg::V0, Reg::V1).execute(&mut state);
+        assert_eq!(state.pc, 0x0202);
+        
+        Opcode::SNEVV(Reg::V0, Reg::V2).execute(&mut state);
+        assert_eq!(state.pc, 0x0202)
     }
 }
