@@ -4,6 +4,8 @@ mod opcode;
 mod util;
 mod sprite;
 
+const INSTR_SIZE: u8 = 2;
+
 /// For conveniently accessing registers in a 16-byte buffer
 #[derive(Debug, PartialEq)]
 pub enum Reg {

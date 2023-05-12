@@ -1,4 +1,4 @@
-use crate::{Reg, Chip8State};
+use crate::{Reg, Chip8State, INSTR_SIZE};
 
 #[allow(clippy::upper_case_acronyms)]
 #[derive(Debug, PartialEq)]
@@ -138,7 +138,11 @@ impl Opcode {
             Opcode::CLS => state.framebuffer.fill(0),
             Opcode::RET => todo!(),
             Opcode::JP(addr) => state.jump_to_address(*addr),
-            Opcode::CALL(_) => todo!(),
+            Opcode::CALL(addr) => {
+                let ret_addr = state.pc + u16::from(INSTR_SIZE);
+                state.push_stack(ret_addr);
+                state.jump_to_address(*addr);
+            },
             Opcode::SEVB(_, _) => todo!(),
             Opcode::SNEVB(_, _) => todo!(),
             Opcode::SEVV(_, _) => todo!(),
@@ -241,5 +245,17 @@ mod tests {
         Opcode::JP(0x300).execute(&mut state);
 
         assert_eq!(state.decode_opcode(), Opcode::LDVB(Reg::V1, 0x23))
+    }
+
+    #[test]
+    fn test_op_call() {
+        let mut state = Chip8State::default();
+
+        Opcode::CALL(0x0123).execute(&mut state);
+
+        assert_eq!(state.stack[0], 0x02);
+        assert_eq!(state.stack[1], 0x02);
+        assert_eq!(state.sp, 0x02);
+        assert_eq!(state.pc, 0x0123)
     }
 }
