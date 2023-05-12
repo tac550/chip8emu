@@ -91,9 +91,8 @@ impl Chip8State {
 
     fn pop_stack(&mut self) -> u16 {
         self.sp -= 2;
-        let value = ((self.stack[self.sp as usize] as u16) << 8) | self.stack[(self.sp + 1) as usize] as u16;
-        
-        value
+
+        (u16::from(self.stack[self.sp as usize]) << 8) | u16::from(self.stack[(self.sp + 1) as usize])
     }
 
     /// Store the provided byte value at the provided memory address.
