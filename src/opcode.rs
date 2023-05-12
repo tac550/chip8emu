@@ -154,7 +154,7 @@ impl Opcode {
             Opcode::LDVV(reg1, reg2) => state.registers[*reg1 as usize] = state.registers[*reg2 as usize],
             Opcode::ORVV(reg1, reg2) => state.registers[*reg1 as usize] |= state.registers[*reg2 as usize],
             Opcode::ANDVV(reg1, reg2) => state.registers[*reg1 as usize] &= state.registers[*reg2 as usize],
-            Opcode::XORVV(_, _) => todo!(),
+            Opcode::XORVV(reg1, reg2) => state.registers[*reg1 as usize] ^= state.registers[*reg2 as usize],
             Opcode::ADDVV(_, _) => todo!(),
             Opcode::SUB(_, _) => todo!(),
             Opcode::SHR(_) => todo!(),
@@ -362,5 +362,16 @@ mod tests {
         Opcode::ANDVV(Reg::V0, Reg::V1).execute(&mut state);
 
         assert_eq!(state.registers[Reg::V0 as usize], 0x05)
+    }
+
+    #[test]
+    fn test_op_xorvv() {
+        let mut state = Chip8State::default();
+        
+        state.registers[Reg::V0 as usize] = 0x55;
+        state.registers[Reg::V1 as usize] = 0x27;
+        Opcode::XORVV(Reg::V0, Reg::V1).execute(&mut state);
+
+        assert_eq!(state.registers[Reg::V0 as usize], 0x72)
     }
 }
