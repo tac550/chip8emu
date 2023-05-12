@@ -1,3 +1,5 @@
+use rand::random;
+
 use crate::{Reg, Chip8State, INSTR_SIZE};
 
 #[allow(clippy::upper_case_acronyms)]
@@ -179,7 +181,7 @@ impl Opcode {
             Opcode::SNEVV(reg1, reg2) => if state.registers[*reg1 as usize] != state.registers[*reg2 as usize] { state.pc += u16::from(INSTR_SIZE) },
             Opcode::LDI(val) => state.index = *val,
             Opcode::JPV0(addr) => state.jump_to_address((addr & 0x0FFF) + u16::from(state.registers[Reg::V0 as usize])),
-            Opcode::RND(_, _) => todo!(),
+            Opcode::RND(reg, mask) => state.registers[*reg as usize] = random::<u8>() & mask,
             Opcode::DRW(_, _, _) => todo!(),
             Opcode::SKP(_) => todo!(),
             Opcode::SKNP(_) => todo!(),
@@ -523,5 +525,16 @@ mod tests {
         state.registers[Reg::V0 as usize] = 0xA0;
         Opcode::JPV0(0x0ABC).execute(&mut state);
         assert_eq!(state.pc, 0x0B5C)
+    }
+
+    #[test]
+    fn test_op_rnd() {
+        let mut state = Chip8State::default();
+
+        Opcode::RND(Reg::V0, 0x0F).execute(&mut state);
+        assert!(state.registers[Reg::V0 as usize] <= 0x0F);
+
+        Opcode::RND(Reg::V0, 0x03).execute(&mut state);
+        assert!(state.registers[Reg::V0 as usize] <= 0x03)
     }
 }
