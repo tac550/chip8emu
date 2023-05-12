@@ -239,7 +239,7 @@ mod tests {
     }
 
     #[test]
-    fn test_op_jmp() {
+    fn test_op_jp() {
         let mut state = Chip8State::default();
 
         state.memory[0x300] = 0x61;
