@@ -236,7 +236,7 @@ mod tests {
         state.push_stack(0x1234);
 
         assert_eq!(state.stack[0..4], [0xAB, 0xCD, 0x12, 0x34]);
-        assert_eq!(state.sp, 4);
+        assert_eq!(state.sp, 4)
     }
 
     #[test]
