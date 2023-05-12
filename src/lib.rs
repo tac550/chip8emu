@@ -1,3 +1,5 @@
+use opcode::Opcode;
+
 mod opcode;
 mod util;
 mod sprite;
@@ -57,6 +59,10 @@ impl Chip8State {
         let hi = self.memory[addr as usize];
         let lo = self.memory[(addr + 1) as usize];
         u16::from(lo) | (u16::from(hi) << 8)
+    }
+
+    fn decode_opcode(&self) -> Opcode {
+        Opcode::from(self.fetch_instruction(self.pc))
     }
 
     fn jump_to_address(&mut self, address: u16) {
@@ -166,6 +172,18 @@ mod tests {
         
         assert_eq!(state.fetch_instruction(0x0), 0x1234);
         assert_eq!(state.fetch_instruction(0xFFE), 0x4321)
+    }
+
+    #[test]
+    fn test_decode_opcode() {
+        let mut state = Chip8State::default();
+
+        state.memory[0x0352] = 0x8A;
+        state.memory[0x0353] = 0xB6;
+
+        state.jump_to_address(0x0352);
+        
+        assert_eq!(state.decode_opcode(), Opcode::SHR(Reg::VA))
     }
 
     #[test]
