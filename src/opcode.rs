@@ -146,7 +146,7 @@ impl Opcode {
                 state.push_stack(ret_addr);
                 state.jump_to_address(*addr);
             },
-            Opcode::SEVB(_, _) => todo!(),
+            Opcode::SEVB(reg, byte) => if state.registers[*reg as usize] == *byte { state.pc += 2 },
             Opcode::SNEVB(_, _) => todo!(),
             Opcode::SEVV(_, _) => todo!(),
             Opcode::LDVB(_, _) => todo!(),
@@ -270,6 +270,19 @@ mod tests {
         Opcode::RET.execute(&mut state);
 
         assert_eq!(state.sp, 0x00);
+        assert_eq!(state.pc, 0x0202)
+    }
+
+    #[test]
+    fn test_op_sevb() {
+        let mut state = Chip8State::default();
+
+        state.registers[Reg::V0 as usize] = 0x78;
+
+        Opcode::SEVB(Reg::V0, 0x78).execute(&mut state);
+        assert_eq!(state.pc, 0x0202);
+        
+        Opcode::SEVB(Reg::V0, 0x22).execute(&mut state);
         assert_eq!(state.pc, 0x0202)
     }
 }
