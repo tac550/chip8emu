@@ -137,7 +137,7 @@ impl Opcode {
         match self {
             Opcode::CLS => state.framebuffer.fill(0),
             Opcode::RET => todo!(),
-            Opcode::JP(_) => todo!(),
+            Opcode::JP(addr) => state.jump_to_address(*addr),
             Opcode::CALL(_) => todo!(),
             Opcode::SEVB(_, _) => todo!(),
             Opcode::SNEVB(_, _) => todo!(),
@@ -229,5 +229,17 @@ mod tests {
         assert_eq!(state.framebuffer[0x12], 0x00);
         assert_eq!(state.framebuffer[0x00], 0x00);
         assert_eq!(state.framebuffer[0xFF], 0x00)
+    }
+
+    #[test]
+    fn test_op_jmp() {
+        let mut state = Chip8State::default();
+
+        state.memory[0x300] = 0x61;
+        state.memory[0x301] = 0x23;
+
+        Opcode::JP(0x300).execute(&mut state);
+
+        assert_eq!(state.decode_opcode(), Opcode::LDVB(Reg::V1, 0x23))
     }
 }
