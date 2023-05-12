@@ -87,6 +87,13 @@ impl Chip8State {
         self.sp += 2;
     }
 
+    fn pop_stack(&mut self) -> u16 {
+        self.sp -= 2;
+        let value = ((self.stack[self.sp as usize] as u16) << 8) | self.stack[(self.sp + 1) as usize] as u16;
+        
+        value
+    }
+
     /// Store the provided byte value at the provided memory address.
     /// 
     /// # Arguments
@@ -230,6 +237,18 @@ mod tests {
 
         assert_eq!(state.stack[0..4], [0xAB, 0xCD, 0x12, 0x34]);
         assert_eq!(state.sp, 4);
+    }
+
+    #[test]
+    fn test_pop_stack() {
+        let mut state = Chip8State::default();
+
+        state.push_stack(0x1234);
+        state.push_stack(0xABCD);
+
+        assert_eq!(state.pop_stack(), 0xABCD);
+        assert_eq!(state.pop_stack(), 0x1234);
+        assert_eq!(state.sp, 0)
     }
 
     #[test]
