@@ -157,11 +157,11 @@ impl Opcode {
             Opcode::XORVV(reg1, reg2) => state.registers[*reg1 as usize] ^= state.registers[*reg2 as usize],
             Opcode::ADDVV(reg1, reg2) => {
                 let result = state.registers[*reg1 as usize].wrapping_add(state.registers[*reg2 as usize]);
-                state.registers[Reg::VF as usize] = if result < state.registers[*reg1 as usize] { 0x01 } else { 0x00 };
+                state.registers[Reg::VF as usize] = u8::from(result < state.registers[*reg1 as usize]);
                 state.registers[*reg1 as usize] = result;
             },
             Opcode::SUB(reg1, reg2) => {
-                state.registers[Reg::VF as usize] = if state.registers[*reg1 as usize] > state.registers[*reg2 as usize] { 0x01 } else { 0x00 };
+                state.registers[Reg::VF as usize] = u8::from(state.registers[*reg1 as usize] > state.registers[*reg2 as usize]);
                 state.registers[*reg1 as usize] = state.registers[*reg1 as usize].wrapping_sub(state.registers[*reg2 as usize]);
             },
             Opcode::SHR(_) => todo!(),
