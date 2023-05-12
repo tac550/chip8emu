@@ -168,7 +168,10 @@ impl Opcode {
                 state.registers[Reg::VF as usize] = state.registers[*reg as usize] & 0x01;
                 state.registers[*reg as usize] >>= 1;
             },
-            Opcode::SUBN(_, _) => todo!(),
+            Opcode::SUBN(reg1, reg2) => {
+                state.registers[Reg::VF as usize] = u8::from(state.registers[*reg2 as usize] > state.registers[*reg1 as usize]);
+                state.registers[*reg1 as usize] = state.registers[*reg2 as usize].wrapping_sub(state.registers[*reg1 as usize]);
+            },
             Opcode::SHL(_) => todo!(),
             Opcode::SNEVV(_, _) => todo!(),
             Opcode::LDI(_) => todo!(),
@@ -443,6 +446,25 @@ mod tests {
         Opcode::SHR(Reg::VE).execute(&mut state);
 
         assert_eq!(state.registers[Reg::VE as usize], 0x20);
+        assert_eq!(state.registers[Reg::VF as usize], 0x00)
+    }
+
+    #[test]
+    fn test_op_subn() {
+        let mut state = Chip8State::default();
+        
+        state.registers[Reg::V0 as usize] = 0x27;
+        state.registers[Reg::V1 as usize] = 0x55;
+        Opcode::SUBN(Reg::V0, Reg::V1).execute(&mut state);
+
+        assert_eq!(state.registers[Reg::V0 as usize], 0x2E);
+        assert_eq!(state.registers[Reg::VF as usize], 0x01);
+
+        state.registers[Reg::VA as usize] = 0x56;
+        state.registers[Reg::VB as usize] = 0x55;
+        Opcode::SUBN(Reg::VA, Reg::VB).execute(&mut state);
+
+        assert_eq!(state.registers[Reg::VA as usize], 0xFF);
         assert_eq!(state.registers[Reg::VF as usize], 0x00)
     }
 }
