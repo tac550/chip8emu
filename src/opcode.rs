@@ -146,8 +146,8 @@ impl Opcode {
                 state.push_stack(ret_addr);
                 state.jump_to_address(*addr);
             },
-            Opcode::SEVB(reg, byte) => if state.registers[*reg as usize] == *byte { state.pc += 2 },
-            Opcode::SNEVB(reg, byte) => if state.registers[*reg as usize] != *byte { state.pc += 2 },
+            Opcode::SEVB(reg, byte) => if state.registers[*reg as usize] == *byte { state.pc += u16::from(INSTR_SIZE) },
+            Opcode::SNEVB(reg, byte) => if state.registers[*reg as usize] != *byte { state.pc += u16::from(INSTR_SIZE) },
             Opcode::SEVV(_, _) => todo!(),
             Opcode::LDVB(_, _) => todo!(),
             Opcode::ADDVB(_, _) => todo!(),
