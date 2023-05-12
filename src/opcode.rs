@@ -150,7 +150,7 @@ impl Opcode {
             Opcode::SNEVB(reg, byte) => if state.registers[*reg as usize] != *byte { state.pc += u16::from(INSTR_SIZE) },
             Opcode::SEVV(reg1, reg2) => if state.registers[*reg1 as usize] == state.registers[*reg2 as usize] { state.pc += u16::from(INSTR_SIZE) },
             Opcode::LDVB(reg, byte) => state.registers[*reg as usize] = *byte,
-            Opcode::ADDVB(_, _) => todo!(),
+            Opcode::ADDVB(reg, byte) => state.registers[*reg as usize] += *byte,
             Opcode::LDVV(_, _) => todo!(),
             Opcode::ORVV(_, _) => todo!(),
             Opcode::ANDVV(_, _) => todo!(),
@@ -320,5 +320,15 @@ mod tests {
         Opcode::LDVB(Reg::VA, 0x12).execute(&mut state);
 
         assert_eq!(state.registers[Reg::VA as usize], 0x12)
+    }
+
+    #[test]
+    fn test_op_addvb() {
+        let mut state = Chip8State::default();
+
+        Opcode::ADDVB(Reg::VB, 0x02).execute(&mut state);
+        Opcode::ADDVB(Reg::VB, 0x03).execute(&mut state);
+
+        assert_eq!(state.registers[Reg::VB as usize], 0x05)
     }
 }
