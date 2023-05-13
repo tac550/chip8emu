@@ -3,11 +3,11 @@ use crate::Chip8State;
 const DEF_SPRITE_HEIGHT: usize = 5;
 
 pub struct DefaultSize {
-    rows: [u8; DEF_SPRITE_HEIGHT],
+    pub rows: [u8; DEF_SPRITE_HEIGHT],
 }
 
 #[allow(clippy::unreadable_literal)]
-static DEFAULT_SPRITES: &[DefaultSize; 16] = &[
+pub static DEFAULT_SPRITES: &[DefaultSize; 16] = &[
     DefaultSize {
         rows: [
             0b11110000,

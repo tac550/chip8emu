@@ -182,7 +182,17 @@ impl Opcode {
             Opcode::LDI(val) => state.index = *val,
             Opcode::JPV0(addr) => state.jump_to_address((addr & 0x0FFF) + u16::from(state.registers[Reg::V0 as usize])),
             Opcode::RND(reg, mask) => state.registers[*reg as usize] = random::<u8>() & mask,
-            Opcode::DRW(_, _, _) => todo!(),
+            Opcode::DRW(x_reg, y_reg, rows) => {
+                let mut overwrite = false;
+                for i in 0..*rows {
+                    overwrite |= state.write_fb(
+                        state.memory[(state.index + u16::from(i)) as usize],
+                        state.registers[*x_reg as usize],
+                        state.registers[*y_reg as usize] + i
+                    );
+                }
+                state.registers[Reg::VF as usize] = u8::from(overwrite);
+            },
             Opcode::SKP(_) => todo!(),
             Opcode::SKNP(_) => todo!(),
             Opcode::LDVDT(_) => todo!(),
@@ -201,6 +211,8 @@ impl Opcode {
 
 #[cfg(test)]
 mod tests {
+    use crate::sprite::DEFAULT_SPRITES;
+
     use super::*;
 
     #[test]
@@ -536,5 +548,32 @@ mod tests {
 
         Opcode::RND(Reg::V0, 0x03).execute(&mut state);
         assert!(state.registers[Reg::V0 as usize] <= 0x03)
+    }
+
+    #[test]
+    fn test_op_drw() {
+        let mut state = Chip8State::default();
+
+        Opcode::DRW(Reg::V0, Reg::V1, 0x05).execute(&mut state);
+        for i in 0..5 {
+            assert_eq!(state.framebuffer[(8 * i) + 0], DEFAULT_SPRITES[0].rows[i]);
+        }
+        assert_eq!(state.registers[Reg::VF as usize], 0x00);
+
+        Opcode::LDI(0x005).execute(&mut state);
+        Opcode::DRW(Reg::V0, Reg::V1, 0x05).execute(&mut state);
+        for i in 0..5 {
+            assert_eq!(state.framebuffer[(8 * i) + 0], DEFAULT_SPRITES[0].rows[i] ^ DEFAULT_SPRITES[1].rows[i]);
+        }
+        assert_eq!(state.registers[Reg::VF as usize], 0x01);
+
+        state.registers[Reg::V0 as usize] = 0x10;
+        state.registers[Reg::V1 as usize] = 0x10;
+        Opcode::LDI(0x00F).execute(&mut state);
+        Opcode::DRW(Reg::V0, Reg::V1, 0x0A).execute(&mut state);
+        for i in 0..10 {
+            assert_eq!(state.framebuffer[(8 * (i + 16)) + 2], DEFAULT_SPRITES[if i < 5 { 3 } else { 4 }].rows[i % 5]);
+        }
+        assert_eq!(state.registers[Reg::VF as usize], 0x00);
     }
 }
