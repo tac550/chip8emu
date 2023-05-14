@@ -195,7 +195,7 @@ impl Opcode {
             },
             Opcode::SKP(reg) => if state.read_input(u16::from(state.registers[*reg as usize])) { state.pc += u16::from(INSTR_SIZE) },
             Opcode::SKNP(reg) => if !state.read_input(u16::from(state.registers[*reg as usize])) { state.pc += u16::from(INSTR_SIZE) },
-            Opcode::LDVDT(_) => todo!(),
+            Opcode::LDVDT(reg) => state.registers[*reg as usize] = state.dt,
             Opcode::LDVK(_) => todo!(),
             Opcode::LDDT(_) => todo!(),
             Opcode::LDST(_) => todo!(),
@@ -607,5 +607,16 @@ mod tests {
         Opcode::SKNP(Reg::V6).execute(&mut state);
 
         assert_eq!(state.pc, 0x0202)
+    }
+
+    #[test]
+    fn test_op_ldvdt() {
+        let mut state = Chip8State::default();
+
+        state.dt = 0xAB;
+
+        Opcode::LDVDT(Reg::V0).execute(&mut state);
+
+        assert_eq!(state.registers[Reg::V0 as usize], 0xAB)
     }
 }
