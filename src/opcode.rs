@@ -665,7 +665,7 @@ mod tests {
         state.registers[Reg::V3 as usize] = 0x12;
         Opcode::LDDT(Reg::V3).execute(&mut state);
 
-        assert_eq!(state.dt, 0x12);
+        assert_eq!(state.dt, 0x12)
     }
 
     #[test]
@@ -675,7 +675,7 @@ mod tests {
         state.registers[Reg::V3 as usize] = 0x12;
         Opcode::LDST(Reg::V3).execute(&mut state);
 
-        assert_eq!(state.st, 0x12);
+        assert_eq!(state.st, 0x12)
     }
 
     #[test]
@@ -686,7 +686,7 @@ mod tests {
         state.registers[Reg::V4 as usize] = 0x30;
         Opcode::ADDI(Reg::V4).execute(&mut state);
 
-        assert_eq!(state.index, 0x0153);
+        assert_eq!(state.index, 0x0153)
     }
 
     #[test]
