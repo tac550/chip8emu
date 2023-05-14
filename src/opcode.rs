@@ -650,6 +650,11 @@ mod tests {
         state.input = 0b0000100001100000;
 
         assert_eq!(Opcode::LDVK(Reg::V0).execute(&mut state), WaitStatus::Running);
-        assert_eq!(state.registers[Reg::V0 as usize], 0x05)
+        assert_eq!(state.registers[Reg::V0 as usize], 0x05);
+
+        state.input = 0b0000100001100001;
+
+        assert_eq!(Opcode::LDVK(Reg::V0).execute(&mut state), WaitStatus::Running);
+        assert_eq!(state.registers[Reg::V0 as usize], 0x00)
     }
 }
