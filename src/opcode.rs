@@ -210,7 +210,7 @@ impl Opcode {
             },
             Opcode::LDDT(reg) => state.dt = state.registers[*reg as usize],
             Opcode::LDST(reg) => state.st = state.registers[*reg as usize],
-            Opcode::ADDI(_) => todo!(),
+            Opcode::ADDI(reg) => state.index += u16::from(state.registers[*reg as usize]),
             Opcode::LDF(_) => todo!(),
             Opcode::LDB(_) => todo!(),
             Opcode::LDIV(_) => todo!(),
@@ -676,5 +676,16 @@ mod tests {
         Opcode::LDST(Reg::V3).execute(&mut state);
 
         assert_eq!(state.st, 0x12);
+    }
+
+    #[test]
+    fn test_op_addi() {
+        let mut state = Chip8State::default();
+
+        state.index = 0x0123;
+        state.registers[Reg::V4 as usize] = 0x30;
+        Opcode::ADDI(Reg::V4).execute(&mut state);
+
+        assert_eq!(state.index, 0x0153);
     }
 }
