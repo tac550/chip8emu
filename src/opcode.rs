@@ -1,6 +1,6 @@
 use rand::random;
 
-use crate::{Reg, Chip8State, INSTR_SIZE};
+use crate::{Reg, Chip8State, INSTR_SIZE, util::BCD};
 
 #[derive(Debug, PartialEq)]
 pub enum WaitStatus {
@@ -212,7 +212,7 @@ impl Opcode {
             Opcode::LDST(reg) => state.st = state.registers[*reg as usize],
             Opcode::ADDI(reg) => state.index += u16::from(state.registers[*reg as usize]),
             Opcode::LDF(reg) => state.index = u16::from(state.registers[*reg as usize]) * 5,
-            Opcode::LDB(_) => todo!(),
+            Opcode::LDB(reg) => state.store_bcd(BCD::from(state.registers[*reg as usize]), state.index),
             Opcode::LDIV(_) => todo!(),
             Opcode::LDVI(_) => todo!(),
             Opcode::NOP => todo!(),
@@ -702,5 +702,19 @@ mod tests {
         Opcode::LDF(Reg::V5).execute(&mut state);
 
         assert_eq!(state.index, 0x0A)
+    }
+
+    #[test]
+    fn test_op_ldb() {
+        let mut state = Chip8State::default();
+
+        state.index = 0x0300;
+        state.registers[Reg::V6 as usize] = 0x89;
+
+        Opcode::LDB(Reg::V6).execute(&mut state);
+
+        assert_eq!(state.memory[0x0300], 0x01);
+        assert_eq!(state.memory[0x0301], 0x03);
+        assert_eq!(state.memory[0x0302], 0x07)
     }
 }
