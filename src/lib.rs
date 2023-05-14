@@ -36,13 +36,14 @@ pub struct Chip8State {
     framebuffer: [u8; 256], // 64x32-Bit Frame Buffer (Monochrome)
 
     memory: [u8; 4096],     // 4K Memory; Programs start at 0x200
+    input: u16,
 }
 
 impl Default for Chip8State {
     fn default() -> Self {
         let mut state = Self { registers: Default::default(), index: Default::default(), stack: [0; 64],
             sp: Default::default(), pc: Default::default(), dt: Default::default(),
-            st: Default::default(), framebuffer: [0; 256], memory: [0; 4096] };
+            st: Default::default(), framebuffer: [0; 256], memory: [0; 4096], input: 0 };
 
         state.init();
         state
@@ -93,6 +94,12 @@ impl Chip8State {
         self.sp -= 2;
 
         (u16::from(self.stack[self.sp as usize]) << 8) | u16::from(self.stack[(self.sp + 1) as usize])
+    }
+
+    fn read_input(&self, key: u16) -> bool {
+        let key = 2u16.pow((key % 16).into());
+
+        self.input & key != 0
     }
 
     /// Store the provided byte value at the provided memory address.
@@ -250,6 +257,21 @@ mod tests {
         assert_eq!(state.pop_stack(), 0xABCD);
         assert_eq!(state.pop_stack(), 0x1234);
         assert_eq!(state.sp, 0)
+    }
+
+    #[test]
+    fn test_read_input() {
+        let mut state = Chip8State::default();
+
+        state.input = 0b1000000000010001;
+
+        assert!(state.read_input(0));
+        assert!(!state.read_input(1));
+        assert!(state.read_input(4));
+        assert!(!state.read_input(5));
+        assert!(state.read_input(15));
+        assert!(state.read_input(16));
+        assert!(!state.read_input(17))
     }
 
     #[test]
