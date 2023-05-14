@@ -2,6 +2,12 @@ use rand::random;
 
 use crate::{Reg, Chip8State, INSTR_SIZE};
 
+#[derive(Debug, PartialEq)]
+pub enum WaitStatus {
+    Waiting,
+    Running,
+}
+
 #[allow(clippy::upper_case_acronyms)]
 #[derive(Debug, PartialEq)]
 pub enum Opcode {
@@ -135,7 +141,7 @@ impl From<u16> for Opcode {
 }
 
 impl Opcode {
-    fn execute(&self, state: &mut Chip8State) {
+    fn execute(&self, state: &mut Chip8State) -> WaitStatus {
         match self {
             Opcode::CLS => state.framebuffer.fill(0),
             Opcode::RET => {
@@ -196,7 +202,12 @@ impl Opcode {
             Opcode::SKP(reg) => if state.read_input(u16::from(state.registers[*reg as usize])) { state.pc += u16::from(INSTR_SIZE) },
             Opcode::SKNP(reg) => if !state.read_input(u16::from(state.registers[*reg as usize])) { state.pc += u16::from(INSTR_SIZE) },
             Opcode::LDVDT(reg) => state.registers[*reg as usize] = state.dt,
-            Opcode::LDVK(_) => todo!(),
+            Opcode::LDVK(reg) =>
+            if state.input == 0 {
+                return WaitStatus::Waiting
+            } else {
+                state.registers[*reg as usize] = state.input.trailing_zeros() as u8
+            },
             Opcode::LDDT(_) => todo!(),
             Opcode::LDST(_) => todo!(),
             Opcode::ADDI(_) => todo!(),
@@ -206,6 +217,8 @@ impl Opcode {
             Opcode::LDVI(_) => todo!(),
             Opcode::NOP => todo!(),
         }
+        
+        WaitStatus::Running
     }
 }
 
@@ -618,5 +631,25 @@ mod tests {
         Opcode::LDVDT(Reg::V0).execute(&mut state);
 
         assert_eq!(state.registers[Reg::V0 as usize], 0xAB)
+    }
+
+    #[test]
+    fn test_op_ldvk() {
+        let mut state = Chip8State::default();
+
+        state.input = 0b0000000000000000;
+
+        assert_eq!(Opcode::LDVK(Reg::V0).execute(&mut state), WaitStatus::Waiting);
+        assert_eq!(state.registers[Reg::V0 as usize], 0x00);
+
+        state.input = 0b0000000000001000;
+
+        assert_eq!(Opcode::LDVK(Reg::V0).execute(&mut state), WaitStatus::Running);
+        assert_eq!(state.registers[Reg::V0 as usize], 0x03);
+
+        state.input = 0b0000100001100000;
+
+        assert_eq!(Opcode::LDVK(Reg::V0).execute(&mut state), WaitStatus::Running);
+        assert_eq!(state.registers[Reg::V0 as usize], 0x05)
     }
 }
