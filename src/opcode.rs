@@ -206,7 +206,7 @@ impl Opcode {
             if state.input == 0 {
                 return WaitStatus::Waiting
             } else {
-                state.registers[*reg as usize] = state.input.trailing_zeros() as u8
+                state.registers[*reg as usize] = state.input.trailing_zeros() as u8;
             },
             Opcode::LDDT(reg) => state.dt = state.registers[*reg as usize],
             Opcode::LDST(reg) => state.st = state.registers[*reg as usize],
