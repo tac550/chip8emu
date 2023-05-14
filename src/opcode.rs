@@ -193,7 +193,7 @@ impl Opcode {
                 }
                 state.registers[Reg::VF as usize] = u8::from(overwrite);
             },
-            Opcode::SKP(_) => todo!(),
+            Opcode::SKP(reg) => if state.read_input(u16::from(state.registers[*reg as usize])) { state.pc += u16::from(INSTR_SIZE) },
             Opcode::SKNP(_) => todo!(),
             Opcode::LDVDT(_) => todo!(),
             Opcode::LDVK(_) => todo!(),
@@ -575,5 +575,21 @@ mod tests {
             assert_eq!(state.framebuffer[(8 * (i + 16)) + 2], DEFAULT_SPRITES[if i < 5 { 3 } else { 4 }].rows[i % 5]);
         }
         assert_eq!(state.registers[Reg::VF as usize], 0x00);
+    }
+
+    #[test]
+    fn test_op_skp() {
+        let mut state = Chip8State::default();
+
+        state.input = 0b0000000000001000;
+        state.registers[Reg::V5 as usize] = 0x03;
+
+        Opcode::SKP(Reg::V5).execute(&mut state);
+
+        assert_eq!(state.pc, 0x0202);
+
+        Opcode::SKP(Reg::V6).execute(&mut state);
+
+        assert_eq!(state.pc, 0x0202)
     }
 }
