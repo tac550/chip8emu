@@ -206,7 +206,8 @@ impl Opcode {
             if state.input == 0 {
                 return WaitStatus::Waiting
             } else {
-                state.registers[*reg as usize] = state.input.trailing_zeros() as u8;
+                // Unwrapping always succeeds since `input` is of type u16 and thus has at most 16 (15 in this case) trailing zeros and the maximum u8 is 255.
+                state.registers[*reg as usize] = u8::try_from(state.input.trailing_zeros()).unwrap();
             },
             Opcode::LDDT(reg) => state.dt = state.registers[*reg as usize],
             Opcode::LDST(reg) => state.st = state.registers[*reg as usize],
