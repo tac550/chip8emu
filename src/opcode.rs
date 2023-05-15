@@ -214,7 +214,12 @@ impl Opcode {
             Opcode::ADDI(reg) => state.index += u16::from(state.registers[*reg as usize]),
             Opcode::LDF(reg) => state.index = u16::from(state.registers[*reg as usize]) * 5,
             Opcode::LDB(reg) => state.store_bcd(BCD::from(state.registers[*reg as usize]), state.index),
-            Opcode::LDIV(_) => todo!(),
+            Opcode::LDIV(reg) => {
+                for i in 0..=*reg as u16 {
+                    state.memory[(state.index + i) as usize] = state.registers[i as usize];
+                }
+                state.index += *reg as u16 + 1;
+            },
             Opcode::LDVI(_) => todo!(),
             Opcode::NOP => todo!(),
         }
@@ -717,5 +722,24 @@ mod tests {
         assert_eq!(state.memory[0x0300], 0x01);
         assert_eq!(state.memory[0x0301], 0x03);
         assert_eq!(state.memory[0x0302], 0x07)
+    }
+
+    #[test]
+    fn test_op_ldiv() {
+        let mut state = Chip8State::default();
+
+        state.index = 0x0400;
+        state.registers[Reg::V0 as usize] = 0x12;
+        state.registers[Reg::V1 as usize] = 0x34;
+        state.registers[Reg::V2 as usize] = 0x56;
+        state.registers[Reg::V3 as usize] = 0x78;
+
+        Opcode::LDIV(Reg::V3).execute(&mut state);
+
+        assert_eq!(state.memory[0x0400], 0x12);
+        assert_eq!(state.memory[0x0401], 0x34);
+        assert_eq!(state.memory[0x0402], 0x56);
+        assert_eq!(state.memory[0x0403], 0x78);
+        assert_eq!(state.index, 0x0404)
     }
 }
