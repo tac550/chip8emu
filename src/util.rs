@@ -24,6 +24,7 @@ impl From<u8> for BCD {
 }
 
 impl BCD {
+    #[cfg(test)]
     pub fn new(hundreds: u8, tens: u8, ones: u8) -> Self {
         Self { hundreds, tens, ones }
     }
