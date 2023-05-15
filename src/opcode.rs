@@ -216,7 +216,7 @@ impl Opcode {
             Opcode::LDB(reg) => state.store_bcd(BCD::from(state.registers[*reg as usize]), state.index),
             Opcode::LDIV(reg) => {
                 for i in 0..=*reg as u16 {
-                    state.memory[(state.index + i) as usize] = state.registers[i as usize];
+                    state.store_to_memory(state.registers[i as usize], state.index + i);
                 }
                 state.index += *reg as u16 + 1;
             },
