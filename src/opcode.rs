@@ -226,7 +226,7 @@ impl Opcode {
                 }
                 state.index += *reg as u16 + 1;
             },
-            Opcode::NOP => todo!(),
+            Opcode::NOP => {},
         }
         
         WaitStatus::Running
