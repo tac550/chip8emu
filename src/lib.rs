@@ -1,10 +1,10 @@
 use opcode::Opcode;
 
-mod opcode;
+pub mod opcode;
 mod util;
 mod sprite;
 
-const INSTR_SIZE: u8 = 2;
+pub const INSTR_SIZE: u8 = 2;
 
 /// For conveniently accessing registers in a 16-byte buffer
 #[derive(Clone, Copy, Debug, PartialEq)]
