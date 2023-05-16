@@ -141,7 +141,8 @@ impl From<u16> for Opcode {
 }
 
 impl Opcode {
-    fn execute(&self, state: &mut Chip8State) -> WaitStatus {
+    #[allow(clippy::missing_panics_doc)]
+    pub fn execute(&self, state: &mut Chip8State) -> WaitStatus {
         match self {
             Opcode::CLS => state.framebuffer.fill(0),
             Opcode::RET => {
