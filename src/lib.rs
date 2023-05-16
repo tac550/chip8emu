@@ -52,6 +52,8 @@ impl Default for Chip8State {
 
 impl Chip8State {
     fn init(&mut self) {
+        self.memory = [0; 4096];
+
         sprite::store_default_sprites(self);
 
         self.pc = 0x0200;
