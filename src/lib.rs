@@ -1,4 +1,4 @@
-use opcode::Opcode;
+use opcode::{Opcode, WaitStatus};
 
 pub mod opcode;
 mod util;
@@ -164,8 +164,14 @@ impl Chip8State {
 }
 
 #[no_mangle]
-pub extern "C" fn chip8_tick(state: &mut Chip8State) -> i32 {
-    i32::from(state.fetch_instruction(0x0))
+pub extern "C" fn chip8_tick(state: &mut Chip8State) {
+    let current_opcode = state.decode_opcode();
+
+    let wait_status = current_opcode.execute(state);
+
+    if wait_status == WaitStatus::Running {
+        state.pc += u16::from(INSTR_SIZE);
+    }
 }
 
 #[no_mangle]
