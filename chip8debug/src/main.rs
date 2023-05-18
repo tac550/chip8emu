@@ -1,7 +1,7 @@
 mod app;
 mod ui;
 
-use std::{io::{self, Write}, time::{Instant, Duration}};
+use std::{io, time::{Instant, Duration}};
 
 use app::App;
 use crossterm::{self, terminal::{enable_raw_mode, EnterAlternateScreen, disable_raw_mode, LeaveAlternateScreen}, execute, event::{EnableMouseCapture, DisableMouseCapture, Event, KeyCode, KeyModifiers}};
