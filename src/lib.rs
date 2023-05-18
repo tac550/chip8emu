@@ -26,7 +26,7 @@ impl From<u8> for Reg {
 
 #[repr(C)]
 pub struct Chip8State {
-    registers: [u8; 16],    // General-Purpose Registers
+    pub registers: [u8; 16],// General-Purpose Registers
     index: u16,             // Index Register
     stack: [u8; 64],        // 64-Byte Stack
     sp: u8,                 // Stack pointer
