@@ -1,5 +1,5 @@
 use chip8exe::{Reg, Chip8State};
-use tui::{backend::Backend, Frame, layout::{Layout, Constraint, Rect, Direction, Alignment}, widgets::{Block, Borders, Row, Cell, Table, BorderType, Paragraph}, style::{Style, Color}, text::{Spans, Span}};
+use tui::{backend::Backend, Frame, layout::{Layout, Constraint, Rect, Direction, Alignment}, widgets::{Block, Borders, Row, Cell, Table, BorderType, Paragraph}, text::{Spans, Span}};
 
 use crate::app::App;
 
@@ -8,16 +8,16 @@ pub fn draw<B: Backend>(f: &mut Frame<B>, app: &mut App) {
         .constraints([Constraint::Length(2), Constraint::Min(36), Constraint::Length(4)].as_ref())
         .split(f.size());
 
-    draw_shortcuts(f, chunks[0]);
+    draw_status(f, app, chunks[0]);
     draw_mem_fb(f, app, chunks[1]);
     draw_reg_dis(f, app, chunks[2]);
 }
 
-fn draw_shortcuts<B: Backend>(f: &mut Frame<B>, area: Rect) {
-    let block = Block::default()
-        .title("Shortcuts | ^Q: Quit")
-        .borders(Borders::NONE);
-    f.render_widget(block, area);
+fn draw_status<B: Backend>(f: &mut Frame<B>, app: &App, area: Rect) {
+    let top_box = Paragraph::new(gen_status_view(app))
+        .alignment(Alignment::Right)
+        .block(Block::default().title(shortcuts_view()).borders(Borders::NONE));
+    f.render_widget(top_box, area);
 }
 
 fn draw_mem_fb<B: Backend>(f: &mut Frame<B>, app: &App, area: Rect) {
@@ -58,6 +58,18 @@ fn draw_reg_dis<B: Backend>(f: &mut Frame<B>, app: &mut App, area: Rect) {
         .borders(Borders::RIGHT)
         .border_type(BorderType::Thick);
     f.render_widget(block, chunks[1]);
+}
+
+fn gen_status_view<'a>(app: &'a App) -> Vec<Spans<'a>>{
+    let mut spans = vec![];
+
+    spans.push(Span::raw(app.disp_frequency()).into());
+
+    spans
+}
+
+fn shortcuts_view() -> String {
+    String::from("Shortcuts | ^Q: Quit")
 }
 
 fn gen_reg_view<'a>(state: &'a Chip8State) -> Vec<Row<'a>> {

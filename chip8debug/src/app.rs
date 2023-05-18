@@ -25,4 +25,20 @@ impl<'a> App<'a> {
     pub fn on_tick(&mut self) {
 
     }
+
+    pub fn disp_frequency(&self) -> String {
+        let mut display = String::from("Frequency: ");
+        if let Some(rate) = self.tick_rate {
+            let hz = (1.0 / rate.as_nanos() as f64) * 1000000000.0;
+            if hz >= 1000000.0 {
+                display.push_str(&format!("{} MHz", hz / 1000000.0));
+            } else {
+                display.push_str(&format!("{} Hz", hz));
+            }
+        } else {
+            display.push_str("Paused");
+        }
+
+        display
+    }
 }
