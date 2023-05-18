@@ -26,10 +26,7 @@ fn draw_mem_fb<B: Backend>(f: &mut Frame<B>, app: &App, area: Rect) {
         .direction(Direction::Horizontal)
         .split(area);
 
-    let block = Block::default()
-        .title("Stack")
-        .borders(Borders::ALL);
-    f.render_widget(block, chunks[0]);
+    draw_stack(f, app, chunks[0]);
 
     let block = Block::default()
         .title("Memory")
@@ -40,6 +37,21 @@ fn draw_mem_fb<B: Backend>(f: &mut Frame<B>, app: &App, area: Rect) {
         .block(Block::default().title("Display").borders(Borders::ALL))
         .alignment(Alignment::Center);
     f.render_widget(display, chunks[2]);
+}
+
+fn draw_stack<B: Backend>(f: &mut Frame<B>, app: &App, area: Rect) {
+    let chunks = Layout::default()
+        .constraints(vec![Constraint::Min(0), Constraint::Length(3)])
+        .direction(Direction::Vertical)
+        .split(area);
+
+    let block = Block::default()
+        .title("Stack")
+        .borders(Borders::ALL);
+    f.render_widget(block, chunks[0]);
+
+    let sp_area = Paragraph::new(gen_sp_view(&app.chip_state));
+    f.render_widget(sp_area, chunks[1]);
 }
 
 fn draw_reg_dis<B: Backend>(f: &mut Frame<B>, app: &mut App, area: Rect) {
@@ -97,6 +109,21 @@ fn render_display(state: &Chip8State) -> Vec<Spans> {
         }
         spans.push(Spans::from(inner_spans));
     }
+
+    spans
+}
+
+fn gen_sp_view(state: &Chip8State) -> Vec<Spans> {
+    let mut spans = vec![];
+
+    spans.push(Spans::from(vec![
+        Span::raw(" SP: "),
+        Span::raw(format!("{:X}", state.sp))
+    ]));
+    spans.push(Spans::from(vec![
+        Span::raw(" PC: "),
+        Span::raw(format!("{:X}", state.pc))
+    ]));
 
     spans
 }

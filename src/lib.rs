@@ -33,9 +33,9 @@ pub struct Chip8State {
     /// 64-Byte Stack
     stack: [u8; 64],
     /// Stack pointer
-    sp: u8,
+    pub sp: u8,
     /// Program Counter
-    pc: u16,
+    pub pc: u16,
     /// Delay Timer
     dt: u8,
     /// Sound Timer
