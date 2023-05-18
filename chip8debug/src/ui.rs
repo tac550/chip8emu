@@ -58,13 +58,13 @@ fn draw_stack<B: Backend>(f: &mut Frame<B>, app: &mut App, area: Rect) {
 
 fn draw_reg_dis<B: Backend>(f: &mut Frame<B>, app: &mut App, area: Rect) {
     let chunks = Layout::default()
-        .constraints(vec![Constraint::Min(0), Constraint::Length(64)])
+        .constraints(vec![Constraint::Percentage(60), Constraint::Percentage(40)])
         .direction(Direction::Horizontal)
         .split(area);
 
     let table = Table::new(gen_reg_view(&app.chip_state))
         .block(Block::default().title("Registers").borders(Borders::LEFT).border_type(BorderType::Thick))
-        .widths(&[Constraint::Percentage(5); 17]);
+        .widths(&[Constraint::Length(4); 17]);
     f.render_widget(table, chunks[0]);
 
     let block = Block::default()
@@ -86,7 +86,7 @@ fn shortcuts_view() -> String {
     String::from("Shortcuts | ^Q: Quit")
 }
 
-fn gen_reg_view<'a>(state: &'a Chip8State) -> Vec<Row<'a>> {
+fn gen_reg_view(state: &Chip8State) -> Vec<Row> {
     let mut row1 = vec![];
     let mut row2 = vec![];
 
@@ -107,7 +107,7 @@ fn render_display(state: &Chip8State) -> Vec<Spans> {
     for y in 0..32 {
         let mut inner_spans = vec![];
         for x in 0..64 {
-            inner_spans.push(if state.framebuffer[(8 * y) + (x / 8)] & 0x80 >> x % 8 == 0 {Span::raw(" ")} else {Span::raw("█")})
+            inner_spans.push(if state.framebuffer[(8 * y) + (x / 8)] & 0x80 >> (x % 8) == 0 {Span::raw(" ")} else {Span::raw("█")})
         }
         spans.push(Spans::from(inner_spans));
     }
