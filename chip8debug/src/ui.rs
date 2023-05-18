@@ -1,5 +1,5 @@
 use chip8exe::{Reg, Chip8State};
-use tui::{backend::Backend, Frame, layout::{Layout, Constraint, Rect, Direction, Alignment}, widgets::{Block, Borders, Row, Cell, Table, BorderType, Paragraph}, text::{Spans, Span}};
+use tui::{backend::Backend, Frame, layout::{Layout, Constraint, Rect, Direction, Alignment}, widgets::{Block, Borders, Row, Cell, Table, BorderType, Paragraph, ListItem, List}, text::{Spans, Span}, style::{Style, Modifier, Color}};
 
 use crate::app::App;
 
@@ -20,7 +20,7 @@ fn draw_status<B: Backend>(f: &mut Frame<B>, app: &App, area: Rect) {
     f.render_widget(top_box, area);
 }
 
-fn draw_mem_fb<B: Backend>(f: &mut Frame<B>, app: &App, area: Rect) {
+fn draw_mem_fb<B: Backend>(f: &mut Frame<B>, app: &mut App, area: Rect) {
     let chunks = Layout::default()
         .constraints(vec![Constraint::Length(12), Constraint::Min(0), Constraint::Length(64)])
         .direction(Direction::Horizontal)
@@ -39,16 +39,18 @@ fn draw_mem_fb<B: Backend>(f: &mut Frame<B>, app: &App, area: Rect) {
     f.render_widget(display, chunks[2]);
 }
 
-fn draw_stack<B: Backend>(f: &mut Frame<B>, app: &App, area: Rect) {
+fn draw_stack<B: Backend>(f: &mut Frame<B>, app: &mut App, area: Rect) {
     let chunks = Layout::default()
         .constraints(vec![Constraint::Min(0), Constraint::Length(3)])
         .direction(Direction::Vertical)
         .split(area);
 
-    let block = Block::default()
-        .title("Stack")
-        .borders(Borders::ALL);
-    f.render_widget(block, chunks[0]);
+    let stack_view = List::new(gen_stack_view(&app.chip_state))
+        .block(Block::default().title("Stack").borders(Borders::ALL))
+        .highlight_style(Style::default().add_modifier(Modifier::BOLD).fg(Color::Yellow))
+        .highlight_symbol("SP>");
+    app.stack_state.select(Some(app.chip_state.sp as usize));
+    f.render_stateful_widget(stack_view, chunks[0], &mut app.stack_state);
 
     let sp_area = Paragraph::new(gen_sp_view(&app.chip_state));
     f.render_widget(sp_area, chunks[1]);
@@ -118,12 +120,21 @@ fn gen_sp_view(state: &Chip8State) -> Vec<Spans> {
 
     spans.push(Spans::from(vec![
         Span::raw(" SP: "),
-        Span::raw(format!("{:X}", state.sp))
+        Span::raw(format!("{:X?}", state.sp))
     ]));
     spans.push(Spans::from(vec![
         Span::raw(" PC: "),
-        Span::raw(format!("{:X}", state.pc))
+        Span::raw(format!("{:X?}", state.pc))
     ]));
 
     spans
+}
+
+fn gen_stack_view(state: &Chip8State) -> Vec<ListItem> {
+    let mut items = vec![];
+    for i in 0..64 {
+        items.push(ListItem::new(format!("{:X?}", state.stack[i])));
+    }
+
+    items
 }

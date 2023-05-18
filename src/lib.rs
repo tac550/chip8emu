@@ -31,7 +31,7 @@ pub struct Chip8State {
     /// Index Register
     pub index: u16,
     /// 64-Byte Stack
-    stack: [u8; 64],
+    pub stack: [u8; 64],
     /// Stack pointer
     pub sp: u8,
     /// Program Counter

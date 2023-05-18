@@ -1,6 +1,7 @@
 use std::time::Duration;
 
 use chip8exe::Chip8State;
+use tui::widgets::ListState;
 
 #[derive(Default)]
 pub struct App<'a> {
@@ -8,6 +9,8 @@ pub struct App<'a> {
     pub should_quit: bool,
     tick_rate: Option<Duration>,
     pub chip_state: Chip8State,
+
+    pub stack_state: ListState,
 }
 
 impl<'a> App<'a> {
