@@ -50,7 +50,7 @@ fn draw_reg_dis<B: Backend>(f: &mut Frame<B>, app: &mut App, area: Rect) {
 
     let table = Table::new(gen_reg_view(&app.chip_state))
         .block(Block::default().title("Registers").borders(Borders::LEFT).border_type(BorderType::Thick))
-        .widths(&[Constraint::Percentage(5); 16]);
+        .widths(&[Constraint::Percentage(5); 17]);
     f.render_widget(table, chunks[0]);
 
     let block = Block::default()
@@ -68,6 +68,9 @@ fn gen_reg_view<'a>(state: &'a Chip8State) -> Vec<Row<'a>> {
         row1.push(Cell::from(format!("{:?}", register)));
         row2.push(Cell::from(format!("{:X?}", state.registers[register as usize])));
     }
+
+    row1.push(Cell::from("Idx"));
+    row2.push(Cell::from(format!("{:X?}", state.index)));
 
     vec![Row::new(row1), Row::new(row2)]
 }
