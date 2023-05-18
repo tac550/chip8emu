@@ -5,7 +5,7 @@ use crate::app::App;
 
 pub fn draw<B: Backend>(f: &mut Frame<B>, app: &mut App) {
     let chunks = Layout::default()
-        .constraints([Constraint::Min(2), Constraint::Min(32), Constraint::Length(4)].as_ref())
+        .constraints([Constraint::Length(2), Constraint::Min(40), Constraint::Length(4)].as_ref())
         .split(f.size());
 
     draw_shortcuts(f, chunks[0]);
