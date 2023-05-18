@@ -5,7 +5,7 @@ use crate::app::App;
 
 pub fn draw<B: Backend>(f: &mut Frame<B>, app: &mut App) {
     let chunks = Layout::default()
-        .constraints([Constraint::Length(2), Constraint::Min(40), Constraint::Length(4)].as_ref())
+        .constraints([Constraint::Length(2), Constraint::Min(36), Constraint::Length(4)].as_ref())
         .split(f.size());
 
     draw_shortcuts(f, chunks[0]);
@@ -55,7 +55,8 @@ fn draw_reg_dis<B: Backend>(f: &mut Frame<B>, app: &mut App, area: Rect) {
 
     let block = Block::default()
         .title("Disassembly")
-        .borders(Borders::ALL);
+        .borders(Borders::RIGHT)
+        .border_type(BorderType::Thick);
     f.render_widget(block, chunks[1]);
 }
 
