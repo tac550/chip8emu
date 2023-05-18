@@ -1,5 +1,5 @@
 use chip8exe::{Reg, Chip8State};
-use tui::{backend::Backend, Frame, layout::{Layout, Constraint, Rect, Direction}, widgets::{Block, Borders, Row, Cell, Table, BorderType}, style::{Style, Color}};
+use tui::{backend::Backend, Frame, layout::{Layout, Constraint, Rect, Direction, Alignment}, widgets::{Block, Borders, Row, Cell, Table, BorderType, Paragraph}, style::{Style, Color}, text::{Spans, Span}};
 
 use crate::app::App;
 
@@ -36,10 +36,10 @@ fn draw_mem_fb<B: Backend>(f: &mut Frame<B>, app: &App, area: Rect) {
         .borders(Borders::ALL);
     f.render_widget(block, chunks[1]);
 
-    let block = Block::default()
-        .title("Display")
-        .borders(Borders::ALL);
-    f.render_widget(block, chunks[2]);
+    let display = Paragraph::new(render_display(&app.chip_state))
+        .block(Block::default().title("Display").borders(Borders::ALL))
+        .alignment(Alignment::Center);
+    f.render_widget(display, chunks[2]);
 }
 
 fn draw_reg_dis<B: Backend>(f: &mut Frame<B>, app: &mut App, area: Rect) {
@@ -73,4 +73,17 @@ fn gen_reg_view<'a>(state: &'a Chip8State) -> Vec<Row<'a>> {
     row2.push(Cell::from(format!("{:X?}", state.index)));
 
     vec![Row::new(row1), Row::new(row2)]
+}
+
+fn render_display(state: &Chip8State) -> Vec<Spans> {
+    let mut spans = vec![];
+    for y in 0..32 {
+        let mut inner_spans = vec![];
+        for x in 0..64 {
+            inner_spans.push(if state.framebuffer[(8 * y) + (x / 8)] & 0x80 >> x % 8 == 0 {Span::raw(" ")} else {Span::raw("█")})
+        }
+        spans.push(Spans::from(inner_spans));
+    }
+
+    spans
 }
