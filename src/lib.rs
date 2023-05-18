@@ -26,16 +26,26 @@ impl From<u8> for Reg {
 
 #[repr(C)]
 pub struct Chip8State {
-    pub registers: [u8; 16],// General-Purpose Registers
-    pub index: u16,         // Index Register
-    stack: [u8; 64],        // 64-Byte Stack
-    sp: u8,                 // Stack pointer
-    pc: u16,                // Program Counter
-    dt: u8,                 // Delay Timer
-    st: u8,                 // Sound Timer
-    framebuffer: [u8; 256], // 64x32-Bit Frame Buffer (Monochrome)
+    /// General-Purpose Registers
+    pub registers: [u8; 16],
+    /// Index Register
+    pub index: u16,
+    /// 64-Byte Stack
+    stack: [u8; 64],
+    /// Stack pointer
+    sp: u8,
+    /// Program Counter
+    pc: u16,
+    /// Delay Timer
+    dt: u8,
+    /// Sound Timer
+    st: u8,
+    /// 64x32-Bit Frame Buffer (Monochrome)
+    pub framebuffer: [u8; 256],
 
-    memory: [u8; 4096],     // 4K Memory; Programs start at 0x200
+    /// 4K Memory; Programs start at 0x200
+    memory: [u8; 4096],
+    /// 16-key emulated keyboard
     input: u16,
 }
 
