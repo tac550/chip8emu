@@ -96,11 +96,11 @@ fn gen_reg_view(state: &Chip8State) -> Vec<Row> {
     for i in 0..=15 {
         let register = Reg::from(i);
         row1.push(Cell::from(format!("{:?}", register)));
-        row2.push(Cell::from(format!("{:X?}", state.registers[register as usize])));
+        row2.push(Cell::from(format!("{:02X?}", state.registers[register as usize])));
     }
 
     row1.push(Cell::from("Idx"));
-    row2.push(Cell::from(format!("{:X?}", state.index)));
+    row2.push(Cell::from(format!("{:04X?}", state.index)));
 
     vec![Row::new(row1), Row::new(row2)]
 }
@@ -123,11 +123,11 @@ fn gen_sp_view(state: &Chip8State) -> Vec<Spans> {
 
     spans.push(Spans::from(vec![
         Span::raw(" SP: "),
-        Span::raw(format!("{:X?}", state.sp))
+        Span::raw(format!("{:02X?}", state.sp))
     ]));
     spans.push(Spans::from(vec![
         Span::raw(" PC: "),
-        Span::raw(format!("{:X?}", state.pc))
+        Span::raw(format!("{:03X?}", state.pc))
     ]));
 
     spans
@@ -137,7 +137,7 @@ fn gen_stack_view(state: &Chip8State) -> Vec<ListItem> {
     let mut items = vec![];
     for i in 0..64 {
         let val = state.stack[i];
-        items.push(ListItem::new(format!("{:X?}", val)).style(value_style(val)));
+        items.push(ListItem::new(format!("{:02X?}", val)).style(value_style(val)));
     }
 
     items
@@ -150,7 +150,7 @@ fn gen_mem_view(state: &Chip8State) -> Vec<Row> {
         let mut row = vec![];
         for x in 0..16 {
             let val = state.memory[(16 * y) + x];
-            row.push(Cell::from(format!("{:X?}", val)).style(value_style(val)));
+            row.push(Cell::from(format!("{:02X?}", val)).style(value_style(val)));
         }
         rows.push(Row::new(row));
     }
