@@ -121,13 +121,13 @@ fn render_display(state: &Chip8State) -> Vec<Spans> {
 fn gen_sp_view(state: &Chip8State) -> Vec<Spans> {
     let mut spans = vec![];
 
+    let val = state.sp;
     spans.push(Spans::from(vec![
-        Span::raw(" SP: "),
-        Span::raw(format!("{:02X?}", state.sp))
+        Span::styled(format!(" SP: {:02X?}", val), style_warn_overrun(val, 64)),
     ]));
+    let val = state.pc;
     spans.push(Spans::from(vec![
-        Span::raw(" PC: "),
-        Span::raw(format!("{:03X?}", state.pc))
+        Span::styled(format!(" PC: {:03X?}", val), style_warn_overrun(val, 4096)),
     ]));
 
     spans
@@ -137,7 +137,7 @@ fn gen_stack_view(state: &Chip8State) -> Vec<ListItem> {
     let mut items = vec![];
     for i in 0..64 {
         let val = state.stack[i];
-        items.push(ListItem::new(format!("{:02X?}", val)).style(value_style(val)));
+        items.push(ListItem::new(format!("{:02X?}", val)).style(style_fade_default(val)));
     }
 
     items
@@ -150,7 +150,7 @@ fn gen_mem_view(state: &Chip8State) -> Vec<Row> {
         let mut row = vec![];
         for x in 0..16 {
             let val = state.memory[(16 * y) + x];
-            row.push(Cell::from(format!("{:02X?}", val)).style(value_style(val)));
+            row.push(Cell::from(format!("{:02X?}", val)).style(style_fade_default(val)));
         }
         rows.push(Row::new(row));
     }
@@ -158,9 +158,17 @@ fn gen_mem_view(state: &Chip8State) -> Vec<Row> {
     rows
 }
 
-fn value_style<T: Default + PartialEq>(val: T) -> Style {
+fn style_fade_default<T: Default + PartialEq>(val: T) -> Style {
     if val == T::default() {
         Style::default().fg(Color::LightCyan)
+    } else {
+        Style::default()
+    }
+}
+
+fn style_warn_overrun<T: PartialOrd>(val: T, limit: T) -> Style {
+    if val >= limit {
+        Style::default().bg(Color::Red)
     } else {
         Style::default()
     }
