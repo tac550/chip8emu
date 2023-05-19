@@ -5,7 +5,7 @@ use std::{io, time::{Instant, Duration}, env};
 
 use app::App;
 use chip8exe::chip8_tick;
-use crossterm::{self, terminal::{enable_raw_mode, EnterAlternateScreen, disable_raw_mode, LeaveAlternateScreen}, execute, event::{EnableMouseCapture, DisableMouseCapture, Event, KeyCode, KeyModifiers}};
+use crossterm::{self, terminal::{enable_raw_mode, EnterAlternateScreen, disable_raw_mode, LeaveAlternateScreen}, execute, event::{EnableMouseCapture, DisableMouseCapture, Event, KeyCode, KeyModifiers, KeyEventKind}};
 use tui::{backend::{CrosstermBackend, Backend}, Terminal};
 
 fn main() -> Result<(), io::Error> {
@@ -45,15 +45,17 @@ fn run_app<B: Backend>(terminal: &mut Terminal<B>, mut app: App) -> io::Result<(
 
         if crossterm::event::poll(timeout)? {
             if let Event::Key(key) = crossterm::event::read()? {
-                if key.modifiers.contains(KeyModifiers::CONTROL) {
-                    match key.code {
-                        KeyCode::Char('q') => app.should_quit = true,
-                    _    => {},
-                    }
-                } else {
-                    match key.code {
-                        KeyCode::Char('s') => chip8_tick(&mut app.chip_state),
-                        _ => {},
+                if key.kind == KeyEventKind::Press {
+                    if key.modifiers.contains(KeyModifiers::CONTROL) {
+                        match key.code {
+                            KeyCode::Char('q') => app.should_quit = true,
+                        _    => {},
+                        }
+                    } else {
+                        match key.code {
+                            KeyCode::Char('s') => chip8_tick(&mut app.chip_state),
+                            _ => {},
+                        }
                     }
                 }
             }
