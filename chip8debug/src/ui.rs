@@ -22,7 +22,7 @@ fn draw_status<B: Backend>(f: &mut Frame<B>, app: &App, area: Rect) {
 
 fn draw_mem_fb<B: Backend>(f: &mut Frame<B>, app: &mut App, area: Rect) {
     let chunks = Layout::default()
-        .constraints(vec![Constraint::Length(12), Constraint::Min(0), Constraint::Length(64)])
+        .constraints(vec![Constraint::Length(10), Constraint::Min(0), Constraint::Length(66)])
         .direction(Direction::Horizontal)
         .split(area);
 

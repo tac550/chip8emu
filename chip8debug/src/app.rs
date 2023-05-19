@@ -1,4 +1,4 @@
-use std::{time::Duration, path::Path, fs::File, io::{self, Read}};
+use std::{time::Duration, fs::File, io::{self, Read}};
 
 use chip8exe::Chip8State;
 use tui::widgets::{ListState, TableState};
@@ -24,7 +24,15 @@ impl<'a> App<'a> {
 
     pub fn load_program(&mut self, path: &str) -> io::Result<()> {
         let mut f = File::open(path)?;
-        f.read(&mut self.chip_state.memory[0x200..])?;
+        let mut bytes_read = 0;
+        loop {
+            let read = f.read(&mut self.chip_state.memory[0x200 + bytes_read..])?;
+            if read == 0 {
+                break;
+            } else {
+                bytes_read += read;
+            }
+        }
         Ok(())
     }
 
