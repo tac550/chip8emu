@@ -29,9 +29,8 @@ impl<'a> App<'a> {
             let read = f.read(&mut self.chip_state.memory[0x200 + bytes_read..])?;
             if read == 0 {
                 break;
-            } else {
-                bytes_read += read;
             }
+            bytes_read += read;
         }
         Ok(())
     }
@@ -47,11 +46,12 @@ impl<'a> App<'a> {
     pub fn disp_frequency(&self) -> String {
         let mut display = String::from("Frequency: ");
         if let Some(rate) = self.tick_rate {
-            let hz = (1.0 / rate.as_nanos() as f64) * 1000000000.0;
-            if hz >= 1000000.0 {
-                display.push_str(&format!("{} MHz", hz / 1000000.0));
+            #[allow(clippy::cast_precision_loss)]
+            let hz = (1.0 / rate.as_nanos() as f64) * 1_000_000_000.0;
+            if hz >= 1_000_000.0 {
+                display.push_str(&format!("{} MHz", hz / 1_000_000.0));
             } else {
-                display.push_str(&format!("{} Hz", hz));
+                display.push_str(&format!("{hz} Hz"));
             }
         } else {
             display.push_str("Paused");
