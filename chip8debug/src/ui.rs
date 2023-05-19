@@ -149,8 +149,9 @@ fn gen_mem_view(state: &Chip8State) -> Vec<Row> {
     for y in 0..256 {
         let mut row = vec![];
         for x in 0..16 {
-            let val = state.memory[(16 * y) + x];
-            row.push(Cell::from(format!("{val:02X?}")).style(style_fade_default(val)));
+            let val = state.memory[(16 * y as usize) + x as usize];
+            let style = style_fade_default(val).add_modifier(if state.pc / 16 == y && state.pc % 16 == x { Modifier::REVERSED } else { Modifier::empty() });
+            row.push(Cell::from(format!("{val:02X?}")).style(style));
         }
         rows.push(Row::new(row));
     }
@@ -160,7 +161,7 @@ fn gen_mem_view(state: &Chip8State) -> Vec<Row> {
 
 fn style_fade_default<T: Default + PartialEq + Copy>(val: T) -> Style {
     if val == T::default() {
-        Style::default().fg(Color::LightCyan)
+        Style::default().add_modifier(Modifier::DIM)
     } else {
         Style::default()
     }
