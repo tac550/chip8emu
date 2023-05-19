@@ -1,7 +1,7 @@
 use std::time::Duration;
 
 use chip8exe::Chip8State;
-use tui::widgets::ListState;
+use tui::widgets::{ListState, TableState};
 
 #[derive(Default)]
 pub struct App<'a> {
@@ -11,6 +11,7 @@ pub struct App<'a> {
     pub chip_state: Chip8State,
 
     pub stack_state: ListState,
+    pub memory_state: TableState,
 }
 
 impl<'a> App<'a> {

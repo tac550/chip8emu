@@ -44,7 +44,7 @@ pub struct Chip8State {
     pub framebuffer: [u8; 256],
 
     /// 4K Memory; Programs start at 0x200
-    memory: [u8; 4096],
+    pub memory: [u8; 4096],
     /// 16-key emulated keyboard
     input: u16,
 }

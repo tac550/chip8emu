@@ -28,10 +28,13 @@ fn draw_mem_fb<B: Backend>(f: &mut Frame<B>, app: &mut App, area: Rect) {
 
     draw_stack(f, app, chunks[0]);
 
-    let block = Block::default()
-        .title("Memory")
-        .borders(Borders::ALL);
-    f.render_widget(block, chunks[1]);
+    let table = Table::new(gen_mem_view(&app.chip_state))
+        .block(Block::default().title("Memory").borders(Borders::ALL))
+        .highlight_style(Style::default().add_modifier(Modifier::BOLD).bg(Color::Cyan))
+        .widths(&[Constraint::Length(4); 16])
+        .header(Row::new((0..16).map(|i| Cell::from(format!("xx{:X?}", i)))));
+    app.memory_state.select(Some((app.chip_state.pc / 16) as usize));
+    f.render_stateful_widget(table, chunks[1], &mut app.memory_state);
 
     let display = Paragraph::new(render_display(&app.chip_state))
         .block(Block::default().title("Display").borders(Borders::ALL))
@@ -133,8 +136,32 @@ fn gen_sp_view(state: &Chip8State) -> Vec<Spans> {
 fn gen_stack_view(state: &Chip8State) -> Vec<ListItem> {
     let mut items = vec![];
     for i in 0..64 {
-        items.push(ListItem::new(format!("{:X?}", state.stack[i])));
+        let val = state.stack[i];
+        items.push(ListItem::new(format!("{:X?}", val)).style(value_style(val)));
     }
 
     items
+}
+
+fn gen_mem_view(state: &Chip8State) -> Vec<Row> {
+    let mut rows = vec![];
+
+    for y in 0..256 {
+        let mut row = vec![];
+        for x in 0..16 {
+            let val = state.memory[(16 * y) + x];
+            row.push(Cell::from(format!("{:X?}", val)).style(value_style(val)));
+        }
+        rows.push(Row::new(row));
+    }
+
+    rows
+}
+
+fn value_style<T: Default + PartialEq>(val: T) -> Style {
+    if val == T::default() {
+        Style::default().fg(Color::LightCyan)
+    } else {
+        Style::default()
+    }
 }
