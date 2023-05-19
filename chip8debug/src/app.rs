@@ -1,4 +1,4 @@
-use std::time::Duration;
+use std::{time::Duration, path::Path, fs::File, io::{self, Read}};
 
 use chip8exe::Chip8State;
 use tui::widgets::{ListState, TableState};
@@ -20,6 +20,12 @@ impl<'a> App<'a> {
             title,
             ..Default::default()
         }
+    }
+
+    pub fn load_program(&mut self, path: &str) -> io::Result<()> {
+        let mut f = File::open(path)?;
+        f.read(&mut self.chip_state.memory[0x200..])?;
+        Ok(())
     }
 
     pub fn get_tick_rate(&self) -> Duration {

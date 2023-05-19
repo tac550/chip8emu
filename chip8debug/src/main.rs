@@ -1,9 +1,10 @@
 mod app;
 mod ui;
 
-use std::{io, time::{Instant, Duration}};
+use std::{io, time::{Instant, Duration}, env};
 
 use app::App;
+use chip8exe::chip8_tick;
 use crossterm::{self, terminal::{enable_raw_mode, EnterAlternateScreen, disable_raw_mode, LeaveAlternateScreen}, execute, event::{EnableMouseCapture, DisableMouseCapture, Event, KeyCode, KeyModifiers}};
 use tui::{backend::{CrosstermBackend, Backend}, Terminal};
 
@@ -15,7 +16,14 @@ fn main() -> Result<(), io::Error> {
     let backend = CrosstermBackend::new(stdout);
     let mut terminal = Terminal::new(backend)?;
 
-    let app = App::new("Chip8 Debugger");
+    let mut app = App::new("Chip8 Debugger");
+
+    // check command line for rom file
+    let args: Vec<String> = env::args().collect();
+    if let Some(arg) = args.get(1) {
+        app.load_program(arg)?;
+    }
+
     let res = run_app(&mut terminal, app);
 
     // restore terminal
@@ -37,13 +45,15 @@ fn run_app<B: Backend>(terminal: &mut Terminal<B>, mut app: App) -> io::Result<(
 
         if crossterm::event::poll(timeout)? {
             if let Event::Key(key) = crossterm::event::read()? {
-                match key.code {
-                    _ => {},
-                }
                 if key.modifiers.contains(KeyModifiers::CONTROL) {
                     match key.code {
                         KeyCode::Char('q') => app.should_quit = true,
                     _    => {},
+                    }
+                } else {
+                    match key.code {
+                        KeyCode::Char('s') => chip8_tick(&mut app.chip_state),
+                        _ => {},
                     }
                 }
             }

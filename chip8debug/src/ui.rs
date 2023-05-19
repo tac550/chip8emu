@@ -86,7 +86,7 @@ fn gen_status_view<'a>(app: &'a App) -> Vec<Spans<'a>>{
 }
 
 fn shortcuts_view() -> String {
-    String::from("Shortcuts | ^Q: Quit")
+    String::from("Shortcuts | ^Q: Quit  S: step 1 instruction")
 }
 
 fn gen_reg_view(state: &Chip8State) -> Vec<Row> {
