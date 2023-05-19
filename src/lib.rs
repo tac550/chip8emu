@@ -76,7 +76,7 @@ impl Chip8State {
         u16::from(lo) | (u16::from(hi) << 8)
     }
 
-    fn decode_opcode(&self) -> Opcode {
+    pub fn decode_opcode(&self) -> Opcode {
         Opcode::from(self.fetch_instruction(self.pc))
     }
 
