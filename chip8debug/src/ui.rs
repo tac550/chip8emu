@@ -150,7 +150,7 @@ fn gen_mem_view(state: &Chip8State) -> Vec<Row> {
         let mut row = vec![];
         for x in 0..16 {
             let val = state.memory[(16 * y as usize) + x as usize];
-            let style = style_fade_default(val).add_modifier(if state.pc / 16 == y && state.pc % 16 == x { Modifier::REVERSED } else { Modifier::empty() });
+            let style = style_fade_default(val).add_modifier(if state.pc / 16 == y && (state.pc % 16 == x || state.pc % 16 == x.saturating_sub(1)) { Modifier::REVERSED } else { Modifier::empty() });
             row.push(Cell::from(format!("{val:02X?}")).style(style));
         }
         rows.push(Row::new(row));
