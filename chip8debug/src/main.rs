@@ -53,7 +53,10 @@ fn run_app<B: Backend>(terminal: &mut Terminal<B>, mut app: App) -> io::Result<(
                         }
                     } else {
                         match key.code {
+                            KeyCode::Up => *app.mem_row_sel_override.get_or_insert(app.memory_state.selected().unwrap_or_default()) -= 1,
+                            KeyCode::Down => *app.mem_row_sel_override.get_or_insert(app.memory_state.selected().unwrap_or_default()) += 1,
                             KeyCode::Char('s') => chip8_tick(&mut app.chip_state),
+                            KeyCode::Char('f') => app.mem_row_sel_override = None,
                             _ => {},
                         }
                     }

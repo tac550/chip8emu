@@ -33,7 +33,7 @@ fn draw_mem_fb<B: Backend>(f: &mut Frame<B>, app: &mut App, area: Rect) {
         .highlight_style(Style::default().add_modifier(Modifier::BOLD).bg(Color::Cyan))
         .widths(&[Constraint::Length(4); 16])
         .header(Row::new((0..16).map(|i| Cell::from(format!("xx{i:X?}")))));
-    app.memory_state.select(Some((app.chip_state.pc / 16) as usize));
+    app.memory_state.select(Some(app.mem_row_sel_override.unwrap_or((app.chip_state.pc / 16) as usize)));
     f.render_stateful_widget(table, chunks[1], &mut app.memory_state);
 
     let display = Paragraph::new(render_display(&app.chip_state))
@@ -84,7 +84,7 @@ fn gen_status_view<'a>(app: &'a App) -> Vec<Spans<'a>>{
 }
 
 fn shortcuts_view() -> String {
-    String::from("Shortcuts | ^Q: Quit  S: step 1 instruction")
+    String::from("Shortcuts | ^Q: Quit  S: Step 1 instruction ↕: Scroll memory view F: Return memory view to PC")
 }
 
 fn gen_reg_view(state: &Chip8State) -> Vec<Row> {

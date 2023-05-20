@@ -12,6 +12,7 @@ pub struct App<'a> {
 
     pub stack_state: ListState,
     pub memory_state: TableState,
+    pub mem_row_sel_override: Option<usize>,
 }
 
 impl<'a> App<'a> {
