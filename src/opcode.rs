@@ -149,7 +149,10 @@ impl Opcode {
                 let ret_addr = state.pop_stack();
                 state.jump_to_address(ret_addr);
             },
-            Opcode::JP(addr) => state.jump_to_address(*addr),
+            Opcode::JP(addr) => {
+                state.jump_to_address(*addr);
+                return WaitStatus::Waiting
+            },
             Opcode::CALL(addr) => {
                 let ret_addr = state.pc + u16::from(INSTR_SIZE);
                 state.push_stack(ret_addr);
