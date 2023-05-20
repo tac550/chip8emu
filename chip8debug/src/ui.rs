@@ -70,7 +70,7 @@ fn draw_reg_dis<B: Backend>(f: &mut Frame<B>, app: &mut App, area: Rect) {
         .widths(&[Constraint::Length(4); 17]);
     f.render_widget(table, chunks[0]);
 
-    let disassembly = Paragraph::new(vec![Spans::default(), Spans::from(vec![Span::raw(format!("{:?}", app.chip_state.decode_opcode()))])])
+    let disassembly = Paragraph::new(vec![Spans::default(), Spans::from(vec![Span::raw(format!("{:X?}", app.chip_state.decode_opcode()))])])
         .block(Block::default().title("Disassembly").borders(Borders::RIGHT).border_type(BorderType::Thick));
     f.render_widget(disassembly, chunks[1]);
 }
