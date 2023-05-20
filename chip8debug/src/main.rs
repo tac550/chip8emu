@@ -49,7 +49,7 @@ fn run_app<B: Backend>(terminal: &mut Terminal<B>, mut app: App) -> io::Result<(
                     if key.modifiers.contains(KeyModifiers::CONTROL) {
                         match key.code {
                             KeyCode::Char('q') => app.should_quit = true,
-                        _    => {},
+                            _ => {},
                         }
                     } else {
                         match key.code {
