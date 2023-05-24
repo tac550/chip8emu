@@ -4,7 +4,7 @@ mod ui;
 use std::{io, time::{Instant, Duration}, env};
 
 use app::App;
-use chip8exe::chip8_tick;
+use chip8exe::{chip8_tick, chip8_reset};
 use crossterm::{self, terminal::{enable_raw_mode, EnterAlternateScreen, disable_raw_mode, LeaveAlternateScreen}, execute, event::{EnableMouseCapture, DisableMouseCapture, Event, KeyCode, KeyModifiers, KeyEventKind}};
 use tui::{backend::{CrosstermBackend, Backend}, Terminal};
 
@@ -18,11 +18,7 @@ fn main() -> Result<(), io::Error> {
 
     let mut app = App::new("Chip8 Debugger");
 
-    // check command line for rom file
-    let args: Vec<String> = env::args().collect();
-    if let Some(arg) = args.get(1) {
-        app.load_program(arg)?;
-    }
+    load_rom_cmdl(&mut app)?;
 
     let res = run_app(&mut terminal, app);
 
@@ -32,6 +28,14 @@ fn main() -> Result<(), io::Error> {
     terminal.show_cursor()?;
     
     Ok(())
+}
+
+fn load_rom_cmdl(app: &mut App) -> Result<(), io::Error> {
+    // check command line for rom file
+    let args: Vec<String> = env::args().collect();
+    Ok(if let Some(arg) = args.get(1) {
+        app.load_program(arg)?;
+    })
 }
 
 fn run_app<B: Backend>(terminal: &mut Terminal<B>, mut app: App) -> io::Result<()> {
@@ -49,6 +53,10 @@ fn run_app<B: Backend>(terminal: &mut Terminal<B>, mut app: App) -> io::Result<(
                     if key.modifiers.contains(KeyModifiers::CONTROL) {
                         match key.code {
                             KeyCode::Char('q') => app.should_quit = true,
+                            KeyCode::Char('r') => {
+                                chip8_reset(&mut app.chip_state);
+                                load_rom_cmdl(&mut app)?;
+                            },
                             _ => {},
                         }
                     } else {

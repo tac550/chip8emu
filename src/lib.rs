@@ -62,11 +62,22 @@ impl Default for Chip8State {
 
 impl Chip8State {
     fn init(&mut self) {
-        self.memory = [0; 4096];
+        self.memory = [0; 4096]; // TODO: Move this to reset()?
 
         sprite::store_default_sprites(self);
 
         self.pc = 0x0200;
+    }
+
+    fn reset(&mut self) {
+        self.registers = [0; 16];
+        self.index = 0;
+        self.stack = [0; 64];
+        self.sp = 0;
+        self.dt = 0;
+        self.st = 0;
+        self.framebuffer = [0; 256];
+        self.init();
     }
 
     fn fetch_instruction(&self, addr: u16) -> u16 {
@@ -189,6 +200,11 @@ pub extern "C" fn chip8_tick(state: &mut Chip8State) {
 #[no_mangle]
 pub extern "C" fn chip8_init(state: &mut Chip8State) {
     state.init();
+}
+
+#[no_mangle]
+pub extern "C" fn chip8_reset(state: &mut Chip8State) {
+    state.reset();
 }
 
 #[cfg(test)]
