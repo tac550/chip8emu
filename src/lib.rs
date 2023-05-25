@@ -197,11 +197,6 @@ pub extern "C" fn chip8_tick(state: &mut Chip8State) {
 }
 
 #[no_mangle]
-pub extern "C" fn chip8_init(state: &mut Chip8State) {
-    state.init();
-}
-
-#[no_mangle]
 pub extern "C" fn chip8_reset(state: &mut Chip8State) {
     state.reset();
 }
