@@ -206,11 +206,6 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_chip8() {
-
-    }
-
-    #[test]
     fn test_fetch_instruction() {
         let mut state = Chip8State::default();
 
