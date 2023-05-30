@@ -1,13 +1,17 @@
 use std::{time::Duration, fs::File, io::{self, Read}};
 
-use chip8exe::Chip8State;
+use chip8exe::{Chip8State, chip8_tick};
 use tui::widgets::{ListState, TableState};
+
+//                           0.5 Hz         1 Hz           5 Hz         10 Hz        100 Hz      1000 Hz    1 MHz
+const DURATIONS: [u64; 7] = [2_000_000_000, 1_000_000_000, 200_000_000, 100_000_000, 10_000_000, 1_000_000, 1000];
 
 #[derive(Default)]
 pub struct App<'a> {
     pub title: &'a str,
     pub should_quit: bool,
     tick_rate: Option<Duration>,
+    selected_rate: usize,
     pub chip_state: Chip8State,
 
     pub stack_state: ListState,
@@ -40,8 +44,38 @@ impl<'a> App<'a> {
         self.tick_rate.unwrap_or(Duration::MAX)
     }
 
-    pub fn on_tick(&mut self) {
+    pub fn inc_tick_rate(&mut self) {
+        if let Some(duration) = &mut self.tick_rate {
+            if let Some(rate) = DURATIONS.get(self.selected_rate + 1) {
+                self.selected_rate += 1;
+                *duration = Duration::from_nanos(*rate);
+            }
+        } else {
+            let sel_rate = DURATIONS.len() - 1;
+            self.tick_rate = Some(Duration::from_nanos(DURATIONS[sel_rate])); // 1 MHz
+            self.selected_rate = sel_rate;
+        }
+    }
 
+    pub fn dec_tick_rate(&mut self) {
+        if let Some(duration) = &mut self.tick_rate {
+            let sub = self.selected_rate.saturating_sub(1);
+            if let Some(rate) = DURATIONS.get(sub) {
+                self.selected_rate = sub;
+                *duration = Duration::from_nanos(*rate);
+            }
+        } else {
+            self.tick_rate = Some(Duration::from_nanos(DURATIONS[0])); // 0.5 Hz
+            self.selected_rate = 0;
+        }
+    }
+
+    pub fn pause_tick(&mut self) {
+        self.tick_rate = None;
+    }
+
+    pub fn on_tick(&mut self) {
+        chip8_tick(&mut self.chip_state)
     }
 
     pub fn disp_frequency(&self) -> String {

@@ -84,7 +84,7 @@ fn gen_status_view<'a>(app: &'a App) -> Vec<Spans<'a>>{
 }
 
 fn shortcuts_view() -> String {
-    String::from("Shortcuts | ^Q: Quit ^R: Reset S: Step 1 instruction ↕: Scroll memory view F: Return memory view to PC")
+    String::from("Shortcuts | ^Q: Quit ^R: Reset S: Step 1 instruction ↕: Scroll memory view F: Return memory view to PC U/J: Inc/Dec Frequency P: Pause")
 }
 
 fn gen_reg_view(state: &Chip8State) -> Vec<Row> {

@@ -56,6 +56,7 @@ fn run_app<B: Backend>(terminal: &mut Terminal<B>, mut app: App) -> io::Result<(
                             KeyCode::Char('q') => app.should_quit = true,
                             KeyCode::Char('r') => {
                                 chip8_reset(&mut app.chip_state);
+                                app.pause_tick();
                                 load_rom_cmdl(&mut app)?;
                             },
                             _ => {},
@@ -72,6 +73,9 @@ fn run_app<B: Backend>(terminal: &mut Terminal<B>, mut app: App) -> io::Result<(
                             },
                             KeyCode::Char('s') => chip8_tick(&mut app.chip_state),
                             KeyCode::Char('f') => app.mem_row_sel_override = None,
+                            KeyCode::Char('u') => app.inc_tick_rate(),
+                            KeyCode::Char('j') => app.dec_tick_rate(),
+                            KeyCode::Char('p') => app.pause_tick(),
                             _ => {},
                         }
                     }
