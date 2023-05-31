@@ -58,6 +58,7 @@ fn run_app<B: Backend>(terminal: &mut Terminal<B>, mut app: App) -> io::Result<(
                                 chip8_reset(&mut app.chip_state);
                                 app.pause_tick();
                                 load_rom_cmdl(&mut app)?;
+                                app.instr_processed = 0;
                             },
                             _ => {},
                         }
@@ -71,7 +72,7 @@ fn run_app<B: Backend>(terminal: &mut Terminal<B>, mut app: App) -> io::Result<(
                                 let ovr = app.mem_row_sel_override.get_or_insert(app.memory_state.selected().unwrap_or_default());
                                 *ovr = ovr.saturating_add(1);
                             },
-                            KeyCode::Char('s') => chip8_tick(&mut app.chip_state),
+                            KeyCode::Char('s') => app.on_tick(),
                             KeyCode::Char('f') => app.mem_row_sel_override = None,
                             KeyCode::Char('u') => app.inc_tick_rate(),
                             KeyCode::Char('j') => app.dec_tick_rate(),

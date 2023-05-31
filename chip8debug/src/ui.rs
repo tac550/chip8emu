@@ -78,7 +78,10 @@ fn draw_reg_dis<B: Backend>(f: &mut Frame<B>, app: &mut App, area: Rect) {
 fn gen_status_view<'a>(app: &'a App) -> Vec<Spans<'a>>{
     let mut spans = vec![];
 
-    spans.push(Span::raw(app.disp_frequency()).into());
+    spans.push(vec![
+        Span::styled(format!("Instruction Count: {} ", app.instr_processed), style_warn_overrun(app.instr_processed, u64::MAX)),
+        Span::raw(format!("| {}", app.disp_frequency())),
+    ].into());
 
     spans
 }

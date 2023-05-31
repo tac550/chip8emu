@@ -12,6 +12,7 @@ pub struct App<'a> {
     pub should_quit: bool,
     tick_rate: Option<Duration>,
     selected_rate: usize,
+    pub instr_processed: u64,
     pub chip_state: Chip8State,
 
     pub stack_state: ListState,
@@ -75,7 +76,8 @@ impl<'a> App<'a> {
     }
 
     pub fn on_tick(&mut self) {
-        chip8_tick(&mut self.chip_state)
+        chip8_tick(&mut self.chip_state);
+        self.instr_processed = self.instr_processed.saturating_add(1);
     }
 
     pub fn disp_frequency(&self) -> String {
