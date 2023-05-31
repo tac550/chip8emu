@@ -4,7 +4,6 @@ mod ui;
 use std::{io, time::{Instant, Duration}, env};
 
 use app::App;
-use chip8exe::{chip8_tick, chip8_reset};
 use crossterm::{self, terminal::{enable_raw_mode, EnterAlternateScreen, disable_raw_mode, LeaveAlternateScreen}, execute, event::{EnableMouseCapture, DisableMouseCapture, Event, KeyCode, KeyModifiers, KeyEventKind}};
 use tui::{backend::{CrosstermBackend, Backend}, Terminal};
 
@@ -55,10 +54,8 @@ fn run_app<B: Backend>(terminal: &mut Terminal<B>, mut app: App) -> io::Result<(
                         match key.code {
                             KeyCode::Char('q') => app.should_quit = true,
                             KeyCode::Char('r') => {
-                                chip8_reset(&mut app.chip_state);
-                                app.pause_tick();
+                                app.reset();
                                 load_rom_cmdl(&mut app)?;
-                                app.instr_processed = 0;
                             },
                             _ => {},
                         }

@@ -1,6 +1,6 @@
 use std::{time::Duration, fs::File, io::{self, Read}};
 
-use chip8exe::{Chip8State, chip8_tick};
+use chip8exe::{Chip8State, chip8_tick, chip8_reset};
 use tui::widgets::{ListState, TableState};
 
 //                           0.5 Hz         1 Hz           5 Hz         10 Hz        100 Hz      1000 Hz    1 MHz
@@ -78,6 +78,12 @@ impl<'a> App<'a> {
     pub fn on_tick(&mut self) {
         chip8_tick(&mut self.chip_state);
         self.instr_processed = self.instr_processed.saturating_add(1);
+    }
+
+    pub fn reset(&mut self) {
+        chip8_reset(&mut self.chip_state);
+        self.pause_tick();
+        self.instr_processed = 0;
     }
 
     pub fn disp_frequency(&self) -> String {
