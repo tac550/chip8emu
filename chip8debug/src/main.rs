@@ -1,9 +1,9 @@
 mod app;
 mod ui;
 
-use std::{io, time::{Instant, Duration}, env};
+use std::{io, time::{Instant, Duration}, env, panic, any::Any};
 
-use app::App;
+use app::{App, Failure};
 use crossterm::{self, terminal::{enable_raw_mode, EnterAlternateScreen, disable_raw_mode, LeaveAlternateScreen}, execute, event::{EnableMouseCapture, DisableMouseCapture, Event, KeyCode, KeyModifiers, KeyEventKind}};
 use tui::{backend::{CrosstermBackend, Backend}, Terminal};
 
@@ -15,7 +15,7 @@ fn main() -> Result<(), io::Error> {
     let backend = CrosstermBackend::new(stdout);
     let mut terminal = Terminal::new(backend)?;
 
-    let mut app = App::new("Chip8 Debugger");
+    let mut app = App::new(None);
 
     load_rom_cmdl(&mut app)?;
 
@@ -69,7 +69,7 @@ fn run_app<B: Backend>(terminal: &mut Terminal<B>, mut app: App) -> io::Result<(
                                 let ovr = app.mem_row_sel_override.get_or_insert(app.memory_state.selected().unwrap_or_default());
                                 *ovr = ovr.saturating_add(1);
                             },
-                            KeyCode::Char('s') => app.on_tick(),
+                            KeyCode::Char('s') => app = try_tick(app)?,
                             KeyCode::Char('f') => app.mem_row_sel_override = None,
                             KeyCode::Char('u') => app.inc_tick_rate(),
                             KeyCode::Char('j') => app.dec_tick_rate(),
@@ -82,12 +82,38 @@ fn run_app<B: Backend>(terminal: &mut Terminal<B>, mut app: App) -> io::Result<(
         }
 
         if last_tick.elapsed() >= app.get_tick_rate() {
-            app.on_tick();
+            app = try_tick(app)?;
             last_tick = Instant::now();
         }
 
         if app.should_quit {
             return Ok(());
         }
+    }
+}
+
+fn try_tick(mut app: App) -> Result<App, io::Error> {
+    let old_hook = panic::take_hook();
+    panic::set_hook(Box::new(|_| {
+        // do nothing
+    }));
+    let last_instr_count = app.instr_count;
+    app = panic::catch_unwind(|| app.on_tick()).unwrap_or_else(|panic|
+        App::new(Some(Failure { panic_message: format!("{:?}", display_caught_panic(&panic)), last_instr_count }))
+    );
+    panic::set_hook(old_hook);
+
+    load_rom_cmdl(&mut app)?;
+
+    Ok(app)
+}
+
+fn display_caught_panic(panic: &Box<dyn Any + Send>) -> String {
+    if let Some(msg) = panic.downcast_ref::<&'static str>() {
+        String::from(*msg)
+    } else if let Some(msg) = panic.downcast_ref::<String>() {
+        String::from(msg)
+    } else {
+        String::from("Unknown Error")
     }
 }

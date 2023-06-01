@@ -75,13 +75,17 @@ fn draw_reg_dis<B: Backend>(f: &mut Frame<B>, app: &mut App, area: Rect) {
     f.render_widget(disassembly, chunks[1]);
 }
 
-fn gen_status_view<'a>(app: &'a App) -> Vec<Spans<'a>>{
+fn gen_status_view(app: &App) -> Vec<Spans>{
     let mut spans = vec![];
 
-    spans.push(vec![
-        Span::styled(format!("Instruction Count: {} ", app.instr_processed), style_warn_overrun(app.instr_processed, u64::MAX)),
-        Span::raw(format!("| {}", app.disp_frequency())),
-    ].into());
+    if let Some(failure) = &app.last_failure {
+        spans.push(Span::styled(format!("Emulator crashed! Error details: {} | Instruction Count: {}", failure.panic_message, failure.last_instr_count), Style::default().bg(Color::Red)).into());
+    } else {
+        spans.push(vec![
+            Span::styled(format!("Instruction Count: {} ", app.instr_count), style_warn_overrun(app.instr_count, u64::MAX)),
+            Span::raw(format!("| {}", app.disp_frequency())),
+        ].into());
+    }
 
     spans
 }

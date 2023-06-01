@@ -6,13 +6,18 @@ use tui::widgets::{ListState, TableState};
 //                           0.5 Hz         1 Hz           5 Hz         10 Hz        100 Hz      1000 Hz    1 MHz
 const DURATIONS: [u64; 7] = [2_000_000_000, 1_000_000_000, 200_000_000, 100_000_000, 10_000_000, 1_000_000, 1000];
 
+pub struct Failure {
+    pub panic_message: String,
+    pub last_instr_count: u64,
+}
+
 #[derive(Default)]
-pub struct App<'a> {
-    pub title: &'a str,
+pub struct App {
+    pub last_failure: Option<Failure>,
     pub should_quit: bool,
     tick_rate: Option<Duration>,
     selected_rate: usize,
-    pub instr_processed: u64,
+    pub instr_count: u64,
     pub chip_state: Chip8State,
 
     pub stack_state: ListState,
@@ -20,10 +25,10 @@ pub struct App<'a> {
     pub mem_row_sel_override: Option<usize>,
 }
 
-impl<'a> App<'a> {
-    pub fn new(title: &'a str) -> Self {
+impl App {
+    pub fn new(last_failure: Option<Failure>) -> Self {
         Self {
-            title,
+            last_failure,
             ..Default::default()
         }
     }
@@ -75,15 +80,21 @@ impl<'a> App<'a> {
         self.tick_rate = None;
     }
 
-    pub fn on_tick(&mut self) {
+    pub fn on_tick(mut self) -> Self {
         chip8_tick(&mut self.chip_state);
-        self.instr_processed = self.instr_processed.saturating_add(1);
+        self.instr_count = self.instr_count.saturating_add(1);
+
+        if self.last_failure.is_some() {
+            self.last_failure = None;
+        }
+
+        self
     }
 
     pub fn reset(&mut self) {
         chip8_reset(&mut self.chip_state);
         self.pause_tick();
-        self.instr_processed = 0;
+        self.instr_count = 0;
     }
 
     pub fn disp_frequency(&self) -> String {
