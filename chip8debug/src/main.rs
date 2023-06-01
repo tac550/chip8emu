@@ -29,7 +29,7 @@ fn main() -> Result<(), io::Error> {
     Ok(())
 }
 
-fn load_rom_cmdl(app: &mut App) -> Result<(), io::Error> {
+fn load_rom_cmdl(app: &mut App) -> io::Result<()> {
     // check command line for rom file
     let args: Vec<String> = env::args().collect();
     if let Some(arg) = args.get(1) {
