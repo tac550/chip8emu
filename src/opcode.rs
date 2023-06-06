@@ -154,9 +154,10 @@ impl Opcode {
                 return WaitStatus::Waiting
             },
             Opcode::CALL(addr) => {
-                let ret_addr = state.pc + u16::from(INSTR_SIZE);
+                let ret_addr = state.pc;
                 state.push_stack(ret_addr);
                 state.jump_to_address(*addr);
+                return WaitStatus::Waiting;
             },
             Opcode::SEVB(reg, byte) => if state.registers[*reg as usize] == *byte { state.pc += u16::from(INSTR_SIZE) },
             Opcode::SNEVB(reg, byte) => if state.registers[*reg as usize] != *byte { state.pc += u16::from(INSTR_SIZE) },
