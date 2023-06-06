@@ -92,20 +92,20 @@ fn run_app<B: Backend>(terminal: &mut Terminal<B>, mut app: App) -> io::Result<(
     }
 }
 
-fn try_tick(mut app: App) -> Result<App, io::Error> {
+fn try_tick(app: App) -> Result<App, io::Error> {
     let old_hook = panic::take_hook();
     panic::set_hook(Box::new(|_| {
         // do nothing
     }));
     let last_instr_count = app.instr_count;
-    app = panic::catch_unwind(|| app.on_tick()).unwrap_or_else(|panic|
-        App::new(Some(Failure { panic_message: format!("{:?}", display_caught_panic(&panic)), last_instr_count }))
-    );
+    let app = panic::catch_unwind(|| Ok(app.on_tick())).unwrap_or_else(|panic| {
+        let mut new_app = App::new(Some(Failure { panic_message: format!("{:?}", display_caught_panic(&panic)), last_instr_count }));
+        load_rom_cmdl(&mut new_app)?;
+        Ok(new_app)
+    });
     panic::set_hook(old_hook);
 
-    load_rom_cmdl(&mut app)?;
-
-    Ok(app)
+    app
 }
 
 fn display_caught_panic(panic: &Box<dyn Any + Send>) -> String {
