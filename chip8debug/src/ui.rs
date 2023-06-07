@@ -68,7 +68,7 @@ fn draw_display<B: Backend>(f: &mut Frame<B>, app: &mut App, area: Rect) {
     f.render_widget(display, chunks[0]);
 
     let timers = Paragraph::new(gen_timer_view(&app.chip_state))
-        .alignment(Alignment::Left);
+        .alignment(Alignment::Right);
     f.render_widget(timers, chunks[1]);
 }
 
@@ -141,11 +141,11 @@ fn gen_timer_view(state: &Chip8State) -> Vec<Spans> {
 
     let val = state.dt;
     spans.push(Spans::from(vec![
-        Span::raw(format!(" Delay Timer: {val:X?}"))
+        Span::raw(format!("Delay Timer: {val:02X?}  "))
     ]));
     let val = state.st;
     spans.push(Spans::from(vec![
-        Span::raw(format!(" Sound Timer: {val:X?}"))
+        Span::raw(format!("Sound Timer: {val:02X?}  "))
     ]));
 
     spans
