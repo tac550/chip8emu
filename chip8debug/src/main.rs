@@ -69,7 +69,10 @@ fn run_app<B: Backend>(terminal: &mut Terminal<B>, mut app: App) -> io::Result<(
                                 let ovr = app.mem_row_sel_override.get_or_insert(app.memory_state.selected().unwrap_or_default());
                                 *ovr = ovr.saturating_add(1);
                             },
-                            KeyCode::Char('n') => app = try_tick(app)?,
+                            KeyCode::Char('n') => {
+                                app = try_tick(app)?;
+                                last_tick = Instant::now();
+                            }
                             KeyCode::Char('m') => app.mem_row_sel_override = None,
                             KeyCode::Char('u') => app.inc_tick_rate(),
                             KeyCode::Char('j') => app.dec_tick_rate(),
