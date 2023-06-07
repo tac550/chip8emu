@@ -36,10 +36,7 @@ fn draw_mem_fb<B: Backend>(f: &mut Frame<B>, app: &mut App, area: Rect) {
     app.memory_state.select(Some(app.mem_row_sel_override.unwrap_or((app.chip_state.pc / 16) as usize)));
     f.render_stateful_widget(table, chunks[1], &mut app.memory_state);
 
-    let display = Paragraph::new(render_display(&app.chip_state))
-        .block(Block::default().title("Display").borders(Borders::ALL))
-        .alignment(Alignment::Center);
-    f.render_widget(display, chunks[2]);
+    draw_display(f, app, chunks[2]);
 }
 
 fn draw_stack<B: Backend>(f: &mut Frame<B>, app: &mut App, area: Rect) {
@@ -57,6 +54,22 @@ fn draw_stack<B: Backend>(f: &mut Frame<B>, app: &mut App, area: Rect) {
 
     let sp_area = Paragraph::new(gen_sp_view(&app.chip_state));
     f.render_widget(sp_area, chunks[1]);
+}
+
+fn draw_display<B: Backend>(f: &mut Frame<B>, app: &mut App, area: Rect) {
+    let chunks = Layout::default()
+        .constraints(vec![Constraint::Length(34), Constraint::Min(0)])
+        .direction(Direction::Vertical)
+        .split(area);
+
+    let display = Paragraph::new(render_display(&app.chip_state))
+        .block(Block::default().title("Display").borders(Borders::ALL))
+        .alignment(Alignment::Center);
+    f.render_widget(display, chunks[0]);
+
+    let timers = Paragraph::new(gen_timer_view(&app.chip_state))
+        .alignment(Alignment::Left);
+    f.render_widget(timers, chunks[1]);
 }
 
 fn draw_reg_dis<B: Backend>(f: &mut Frame<B>, app: &mut App, area: Rect) {
@@ -119,6 +132,21 @@ fn render_display(state: &Chip8State) -> Vec<Spans> {
         }
         spans.push(Spans::from(inner_spans));
     }
+
+    spans
+}
+
+fn gen_timer_view(state: &Chip8State) -> Vec<Spans> {
+    let mut spans = vec![];
+
+    let val = state.dt;
+    spans.push(Spans::from(vec![
+        Span::raw(format!(" Delay Timer: {val:X?}"))
+    ]));
+    let val = state.st;
+    spans.push(Spans::from(vec![
+        Span::raw(format!(" Sound Timer: {val:X?}"))
+    ]));
 
     spans
 }

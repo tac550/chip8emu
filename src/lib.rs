@@ -37,9 +37,9 @@ pub struct Chip8State {
     /// Program Counter
     pub pc: u16,
     /// Delay Timer
-    dt: u8,
+    pub dt: u8,
     /// Sound Timer
-    st: u8,
+    pub st: u8,
     /// 64x32-Bit Frame Buffer (Monochrome)
     pub framebuffer: [u8; 256],
 
