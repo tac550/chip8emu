@@ -316,7 +316,7 @@ mod tests {
         Opcode::CALL(0x0123).execute(&mut state);
 
         assert_eq!(state.stack[0], 0x02);
-        assert_eq!(state.stack[1], 0x02);
+        assert_eq!(state.stack[1], 0x00);
         assert_eq!(state.sp, 0x02);
         assert_eq!(state.pc, 0x0123)
     }
@@ -329,7 +329,7 @@ mod tests {
         Opcode::RET.execute(&mut state);
 
         assert_eq!(state.sp, 0x00);
-        assert_eq!(state.pc, 0x0202)
+        assert_eq!(state.pc, 0x0200)
     }
 
     #[test]
