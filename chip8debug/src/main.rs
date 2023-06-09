@@ -1,9 +1,9 @@
 mod app;
 mod ui;
 
-use std::{io, time::{Instant, Duration}, env, panic, any::Any};
+use std::{io, time::{Duration, UNIX_EPOCH, SystemTime, SystemTimeError}, env, panic, any::Any};
 
-use app::{App, Failure};
+use app::{App, Failure, TIMER_RATE};
 use crossterm::{self, terminal::{enable_raw_mode, EnterAlternateScreen, disable_raw_mode, LeaveAlternateScreen}, execute, event::{EnableMouseCapture, DisableMouseCapture, Event, KeyCode, KeyModifiers, KeyEventKind}};
 use tui::{backend::{CrosstermBackend, Backend}, Terminal};
 
@@ -39,12 +39,12 @@ fn load_rom_cmdl(app: &mut App) -> io::Result<()> {
 }
 
 fn run_app<B: Backend>(terminal: &mut Terminal<B>, mut app: App) -> io::Result<()> {
-    let mut last_tick = Instant::now();
+    let mut last_tick = SystemTime::now();
     loop {
         terminal.draw(|f| ui::draw(f, &mut app))?;
 
         let timeout = app.get_tick_rate()
-            .checked_sub(last_tick.elapsed())
+            .checked_sub(last_tick.elapsed().unwrap_or_default())
             .unwrap_or_else(|| Duration::from_secs(0));
 
         if crossterm::event::poll(timeout)? {
@@ -70,8 +70,9 @@ fn run_app<B: Backend>(terminal: &mut Terminal<B>, mut app: App) -> io::Result<(
                                 *ovr = ovr.saturating_add(1);
                             },
                             KeyCode::Char('n') => {
-                                app = try_tick(app)?;
-                                last_tick = Instant::now();
+                                let this_tick = SystemTime::now();
+                                app = try_tick(app, last_tick, this_tick)?;
+                                last_tick = this_tick;
                             }
                             KeyCode::Char('m') => app.mem_row_sel_override = None,
                             KeyCode::Char('u') => app.inc_tick_rate(),
@@ -84,9 +85,10 @@ fn run_app<B: Backend>(terminal: &mut Terminal<B>, mut app: App) -> io::Result<(
             }
         }
 
-        if last_tick.elapsed() >= app.get_tick_rate() {
-            app = try_tick(app)?;
-            last_tick = Instant::now();
+        if last_tick.elapsed().unwrap_or_default() >= app.get_tick_rate() {
+            let this_tick = SystemTime::now();
+            app = try_tick(app, last_tick, this_tick)?;
+            last_tick = this_tick;
         }
 
         if app.should_quit {
@@ -95,13 +97,15 @@ fn run_app<B: Backend>(terminal: &mut Terminal<B>, mut app: App) -> io::Result<(
     }
 }
 
-fn try_tick(app: App) -> Result<App, io::Error> {
+fn try_tick(app: App, last_tick: SystemTime, this_tick: SystemTime) -> Result<App, io::Error> {
+    let timer_ticks = timer_ticks_since(last_tick, this_tick).unwrap_or_default();
+
     let old_hook = panic::take_hook();
     panic::set_hook(Box::new(|_| {
         // do nothing
     }));
     let last_instr_count = app.instr_count;
-    let app = panic::catch_unwind(|| Ok(app.on_tick())).unwrap_or_else(|panic| {
+    let app = panic::catch_unwind(|| Ok(app.on_tick(timer_ticks))).unwrap_or_else(|panic| {
         let mut new_app = App::new(Some(Failure { panic_message: format!("{:?}", display_caught_panic(&panic)), last_instr_count }));
         load_rom_cmdl(&mut new_app)?;
         Ok(new_app)
@@ -109,6 +113,16 @@ fn try_tick(app: App) -> Result<App, io::Error> {
     panic::set_hook(old_hook);
 
     app
+}
+
+fn timer_ticks_since(last_tick: SystemTime, this_tick: SystemTime) -> Result<u32, SystemTimeError> {
+    let last_nanos = last_tick.duration_since(UNIX_EPOCH)?.as_nanos();
+    let this_nanos = this_tick.duration_since(UNIX_EPOCH)?.as_nanos();
+
+    let last_pos = last_nanos / TIMER_RATE;
+    let this_pos = this_nanos / TIMER_RATE;
+
+    Ok(u32::try_from(this_pos.saturating_sub(last_pos)).unwrap_or_default())
 }
 
 fn display_caught_panic(panic: &Box<dyn Any + Send>) -> String {

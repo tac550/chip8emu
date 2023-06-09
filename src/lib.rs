@@ -187,7 +187,11 @@ impl Chip8State {
 }
 
 #[no_mangle]
-pub extern "C" fn chip8_tick(state: &mut Chip8State) {
+pub extern "C" fn chip8_tick(state: &mut Chip8State, time_passed: u32) {
+    for _ in 0..time_passed {
+        state.decrement_timers();
+    }
+
     let current_opcode = state.decode_opcode();
 
     let wait_status = current_opcode.execute(state);
