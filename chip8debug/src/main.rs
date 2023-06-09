@@ -7,7 +7,7 @@ use app::{App, Failure, TIMER_RATE};
 use crossterm::{self, terminal::{enable_raw_mode, EnterAlternateScreen, disable_raw_mode, LeaveAlternateScreen}, execute, event::{EnableMouseCapture, DisableMouseCapture, Event, KeyCode, KeyModifiers, KeyEventKind}};
 use tui::{backend::{CrosstermBackend, Backend}, Terminal};
 
-fn main() -> Result<(), io::Error> {
+fn main() -> io::Result<()> {
     // set up terminal
     enable_raw_mode()?;
     let mut stdout = io::stdout();
@@ -97,7 +97,7 @@ fn run_app<B: Backend>(terminal: &mut Terminal<B>, mut app: App) -> io::Result<(
     }
 }
 
-fn try_tick(app: App, last_tick: SystemTime, this_tick: SystemTime) -> Result<App, io::Error> {
+fn try_tick(app: App, last_tick: SystemTime, this_tick: SystemTime) -> io::Result<App> {
     let timer_ticks = timer_ticks_between(last_tick, this_tick).unwrap_or_default();
 
     let old_hook = panic::take_hook();
