@@ -98,7 +98,7 @@ fn run_app<B: Backend>(terminal: &mut Terminal<B>, mut app: App) -> io::Result<(
 }
 
 fn try_tick(app: App, last_tick: SystemTime, this_tick: SystemTime) -> Result<App, io::Error> {
-    let timer_ticks = timer_ticks_since(last_tick, this_tick).unwrap_or_default();
+    let timer_ticks = timer_ticks_between(last_tick, this_tick).unwrap_or_default();
 
     let old_hook = panic::take_hook();
     panic::set_hook(Box::new(|_| {
@@ -115,7 +115,7 @@ fn try_tick(app: App, last_tick: SystemTime, this_tick: SystemTime) -> Result<Ap
     app
 }
 
-fn timer_ticks_since(last_tick: SystemTime, this_tick: SystemTime) -> Result<u32, SystemTimeError> {
+fn timer_ticks_between(last_tick: SystemTime, this_tick: SystemTime) -> Result<u32, SystemTimeError> {
     let last_nanos = last_tick.duration_since(UNIX_EPOCH)?.as_nanos();
     let this_nanos = this_tick.duration_since(UNIX_EPOCH)?.as_nanos();
 
