@@ -46,7 +46,7 @@ pub struct Chip8State {
     /// 4K Memory; Programs start at 0x200
     pub memory: [u8; 4096],
     /// 16-key emulated keyboard
-    input: u16,
+    pub input: u16,
 }
 
 impl Default for Chip8State {

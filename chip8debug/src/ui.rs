@@ -147,6 +147,10 @@ fn gen_timer_view(state: &Chip8State) -> Vec<Spans> {
     spans.push(Spans::from(vec![
         Span::raw(format!("Sound Timer: {val:02X?}  "))
     ]));
+    let val = state.input;
+    spans.push(Spans::from(vec![
+        Span::raw(format!("Input: {val:016b}  "))
+    ]));
 
     spans
 }
