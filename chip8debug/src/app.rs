@@ -97,6 +97,7 @@ impl App {
         chip8_reset(&mut self.chip_state);
         self.pause_tick();
         self.instr_count = 0;
+        self.chip_state.input = 0;
     }
 
     pub fn disp_frequency(&self) -> String {
