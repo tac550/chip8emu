@@ -163,7 +163,7 @@ impl Opcode {
             Opcode::SNEVB(reg, byte) => if state.registers[*reg as usize] != *byte { state.pc += u16::from(INSTR_SIZE) },
             Opcode::SEVV(reg1, reg2) => if state.registers[*reg1 as usize] == state.registers[*reg2 as usize] { state.pc += u16::from(INSTR_SIZE) },
             Opcode::LDVB(reg, byte) => state.registers[*reg as usize] = *byte,
-            Opcode::ADDVB(reg, byte) => state.registers[*reg as usize] += *byte,
+            Opcode::ADDVB(reg, byte) => state.registers[*reg as usize] = state.registers[*reg as usize].wrapping_add(*byte),
             Opcode::LDVV(reg1, reg2) => state.registers[*reg1 as usize] = state.registers[*reg2 as usize],
             Opcode::ORVV(reg1, reg2) => state.registers[*reg1 as usize] |= state.registers[*reg2 as usize],
             Opcode::ANDVV(reg1, reg2) => state.registers[*reg1 as usize] &= state.registers[*reg2 as usize],
@@ -216,7 +216,7 @@ impl Opcode {
             },
             Opcode::LDDT(reg) => state.dt = state.registers[*reg as usize],
             Opcode::LDST(reg) => state.st = state.registers[*reg as usize],
-            Opcode::ADDI(reg) => state.index += u16::from(state.registers[*reg as usize]),
+            Opcode::ADDI(reg) => state.index = state.index.wrapping_add(u16::from(state.registers[*reg as usize])),
             Opcode::LDF(reg) => state.index = u16::from(state.registers[*reg as usize]) * 5,
             Opcode::LDB(reg) => state.store_bcd(BCD::from(state.registers[*reg as usize]), state.index),
             Opcode::LDIV(reg) => {
