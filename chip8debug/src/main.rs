@@ -15,9 +15,7 @@ fn main() -> io::Result<()> {
     let backend = CrosstermBackend::new(stdout);
     let mut terminal = Terminal::new(backend)?;
 
-    let mut app = App::new(None);
-
-    load_rom_cmdl(&mut app)?;
+    let app = App::new(None);
 
     let res = run_app(&mut terminal, app);
 
@@ -26,6 +24,10 @@ fn main() -> io::Result<()> {
     execute!(terminal.backend_mut(), LeaveAlternateScreen, DisableMouseCapture)?;
     terminal.show_cursor()?;
     
+    if let Err(err) = res {
+        println!("{err}");
+    }
+
     Ok(())
 }
 
@@ -39,6 +41,8 @@ fn load_rom_cmdl(app: &mut App) -> io::Result<()> {
 }
 
 fn run_app<B: Backend>(terminal: &mut Terminal<B>, mut app: App) -> io::Result<()> {
+    load_rom_cmdl(&mut app)?;
+
     let mut last_tick = SystemTime::now();
     loop {
         terminal.draw(|f| ui::draw(f, &mut app))?;
