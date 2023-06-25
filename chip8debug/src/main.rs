@@ -24,11 +24,11 @@ fn main() -> io::Result<()> {
     execute!(terminal.backend_mut(), LeaveAlternateScreen, DisableMouseCapture)?;
     terminal.show_cursor()?;
     
-    if let Err(err) = res {
+    if let Err(ref err) = res {
         println!("{err}");
     }
 
-    Ok(())
+    res
 }
 
 fn load_rom_cmdl(app: &mut App) -> io::Result<()> {
