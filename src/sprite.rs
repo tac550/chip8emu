@@ -56,7 +56,7 @@ pub static DEFAULT_SPRITES: &[DefaultSize; 16] = &[
     DefaultSize {
         rows: [
             0b11110000,
-            0b10010000,
+            0b10000000,
             0b11110000,
             0b00010000,
             0b11110000,
