@@ -49,7 +49,11 @@ impl App {
     }
 
     pub fn get_tick_rate(&self) -> Duration {
-        self.tick_rate.unwrap_or(Duration::MAX)
+        self.tick_rate.unwrap_or(Duration::from_millis(16))
+    }
+
+    pub fn is_paused(&self) -> bool {
+        self.tick_rate.is_none()
     }
 
     pub fn inc_tick_rate(&mut self) {

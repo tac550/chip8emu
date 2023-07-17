@@ -43,12 +43,13 @@ fn load_rom_cmdl(app: &mut App) -> io::Result<()> {
 fn run_app<B: Backend>(terminal: &mut Terminal<B>, mut app: App) -> io::Result<()> {
     load_rom_cmdl(&mut app)?;
 
-    let mut last_tick = SystemTime::now();
     loop {
+        let mut last_refresh = SystemTime::now();
+
         terminal.draw(|f| ui::draw(f, &mut app))?;
 
         let timeout = app.get_tick_rate()
-            .checked_sub(last_tick.elapsed().unwrap_or_default())
+            .checked_sub(last_refresh.elapsed().unwrap_or_default())
             .unwrap_or_else(|| Duration::from_secs(0));
 
         if crossterm::event::poll(timeout)? {
@@ -74,8 +75,8 @@ fn run_app<B: Backend>(terminal: &mut Terminal<B>, mut app: App) -> io::Result<(
                         },
                         KeyCode::Char('n') => {
                             let this_tick = SystemTime::now();
-                            app = try_tick(app, last_tick, this_tick)?;
-                            last_tick = this_tick;
+                            app = try_tick(app, last_refresh, this_tick)?;
+                            last_refresh = this_tick;
                         }
                         KeyCode::Char('m') => app.mem_row_sel_override = None,
                         KeyCode::Char('u') => app.inc_tick_rate(),
@@ -87,10 +88,9 @@ fn run_app<B: Backend>(terminal: &mut Terminal<B>, mut app: App) -> io::Result<(
             }
         }
 
-        if last_tick.elapsed().unwrap_or_default() >= app.get_tick_rate() {
-            let this_tick = SystemTime::now();
-            app = try_tick(app, last_tick, this_tick)?;
-            last_tick = this_tick;
+        if !app.is_paused() && last_refresh.elapsed().unwrap_or_default() >= app.get_tick_rate() {
+            app = multi_tick(app, last_refresh)?;
+            last_refresh = SystemTime::now();
         }
 
         if app.should_quit {
@@ -145,6 +145,30 @@ fn try_tick(app: App, last_tick: SystemTime, this_tick: SystemTime) -> io::Resul
     panic::set_hook(old_hook);
 
     app
+}
+
+fn multi_tick(mut app: App, last_multi: SystemTime) -> io::Result<App> {
+    let cpu_ticks = cpu_ticks_between(&app, last_multi, SystemTime::now()).unwrap_or(1);
+
+    let mut last_tick = last_multi;
+
+    for _ in 0..cpu_ticks {
+        let this_tick = SystemTime::now();
+        app = try_tick(app, last_tick, this_tick)?;
+        last_tick = this_tick;
+    }
+
+    Ok(app)
+}
+
+fn cpu_ticks_between(app: &App, last_tick: SystemTime, this_tick: SystemTime) -> Result<u32, SystemTimeError> {
+    let last_nanos = last_tick.duration_since(UNIX_EPOCH)?.as_nanos();
+    let this_nanos = this_tick.duration_since(UNIX_EPOCH)?.as_nanos();
+
+    let last_pos = last_nanos / app.get_tick_rate().as_nanos();
+    let this_pos = this_nanos / app.get_tick_rate().as_nanos();
+
+    Ok(u32::try_from(this_pos.saturating_sub(last_pos)).unwrap_or_default())
 }
 
 fn timer_ticks_between(last_tick: SystemTime, this_tick: SystemTime) -> Result<u32, SystemTimeError> {
