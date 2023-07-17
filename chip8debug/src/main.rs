@@ -43,8 +43,11 @@ fn load_rom_cmdl(app: &mut App) -> io::Result<()> {
 fn run_app<B: Backend>(terminal: &mut Terminal<B>, mut app: App) -> io::Result<()> {
     load_rom_cmdl(&mut app)?;
 
+    let mut last_refresh = SystemTime::now();
     loop {
-        let mut last_refresh = SystemTime::now();
+        if app.is_paused() {
+            last_refresh = SystemTime::now();
+        }
 
         terminal.draw(|f| ui::draw(f, &mut app))?;
 
