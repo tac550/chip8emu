@@ -133,7 +133,7 @@ fn process_chip8_input(key: KeyEvent, app: &mut App) -> bool {
 }
 
 fn try_tick(app: App, last_tick: SystemTime, this_tick: SystemTime) -> io::Result<App> {
-    let timer_ticks = timer_ticks_between(last_tick, this_tick).unwrap_or_default();
+    let timer_ticks = ticks_between(TIMER_RATE, last_tick, this_tick).unwrap_or_default();
 
     let old_hook = panic::take_hook();
     panic::set_hook(Box::new(|_| {
@@ -151,7 +151,7 @@ fn try_tick(app: App, last_tick: SystemTime, this_tick: SystemTime) -> io::Resul
 }
 
 fn multi_tick(mut app: App, last_multi: SystemTime) -> io::Result<App> {
-    let cpu_ticks = cpu_ticks_between(&app, last_multi, SystemTime::now()).unwrap_or(1);
+    let cpu_ticks = ticks_between(app.get_tick_rate().as_nanos(), last_multi, SystemTime::now()).unwrap_or(1);
 
     let mut last_tick = last_multi;
 
@@ -164,22 +164,12 @@ fn multi_tick(mut app: App, last_multi: SystemTime) -> io::Result<App> {
     Ok(app)
 }
 
-fn cpu_ticks_between(app: &App, last_tick: SystemTime, this_tick: SystemTime) -> Result<u32, SystemTimeError> {
+fn ticks_between(duration_nanos: u128, last_tick: SystemTime, this_tick: SystemTime) -> Result<u32, SystemTimeError> {
     let last_nanos = last_tick.duration_since(UNIX_EPOCH)?.as_nanos();
     let this_nanos = this_tick.duration_since(UNIX_EPOCH)?.as_nanos();
 
-    let last_pos = last_nanos / app.get_tick_rate().as_nanos();
-    let this_pos = this_nanos / app.get_tick_rate().as_nanos();
-
-    Ok(u32::try_from(this_pos.saturating_sub(last_pos)).unwrap_or_default())
-}
-
-fn timer_ticks_between(last_tick: SystemTime, this_tick: SystemTime) -> Result<u32, SystemTimeError> {
-    let last_nanos = last_tick.duration_since(UNIX_EPOCH)?.as_nanos();
-    let this_nanos = this_tick.duration_since(UNIX_EPOCH)?.as_nanos();
-
-    let last_pos = last_nanos / TIMER_RATE;
-    let this_pos = this_nanos / TIMER_RATE;
+    let last_pos = last_nanos / duration_nanos;
+    let this_pos = this_nanos / duration_nanos;
 
     Ok(u32::try_from(this_pos.saturating_sub(last_pos)).unwrap_or_default())
 }
