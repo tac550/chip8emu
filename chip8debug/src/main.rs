@@ -158,6 +158,12 @@ fn multi_tick(mut app: App, last_multi: SystemTime) -> io::Result<App> {
     for _ in 0..cpu_ticks {
         let this_tick = SystemTime::now();
         app = try_tick(app, last_tick, this_tick)?;
+
+        if app.is_paused() {
+            // Indicates a crash leading to the emulation being reset and paused
+            break;
+        }
+
         last_tick = this_tick;
     }
 
