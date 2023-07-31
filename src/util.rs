@@ -41,7 +41,7 @@ mod tests {
     }
 
     #[test]
-    fn test_u8_to_bcd() {
+    fn test_bcd_from_u8() {
         assert_eq!(BCD::from(0), BCD::new(0, 0, 0));
         assert_eq!(BCD::from(5), BCD::new(0, 0, 5));
         assert_eq!(BCD::from(50), BCD::new(0, 5, 0));
