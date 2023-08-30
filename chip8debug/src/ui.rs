@@ -1,5 +1,5 @@
 use chip8exe::{Reg, Chip8State};
-use ratatui::{backend::Backend, Frame, layout::{Layout, Constraint, Rect, Direction, Alignment}, widgets::{Block, Borders, Row, Cell, Table, BorderType, Paragraph, ListItem, List}, text::{Spans, Span}, style::{Style, Modifier, Color}};
+use ratatui::{backend::Backend, Frame, layout::{Layout, Constraint, Rect, Direction, Alignment}, widgets::{Block, Borders, Row, Cell, Table, BorderType, Paragraph, ListItem, List}, text::{Span, Line}, style::{Style, Modifier, Color}};
 
 use crate::app::App;
 
@@ -83,12 +83,12 @@ fn draw_reg_dis<B: Backend>(f: &mut Frame<B>, app: &mut App, area: Rect) {
         .widths(&[Constraint::Length(4); 17]);
     f.render_widget(table, chunks[0]);
 
-    let disassembly = Paragraph::new(vec![Spans::default(), Spans::from(vec![Span::raw(format!("{:X?}", app.chip_state.decode_opcode()))])])
+    let disassembly = Paragraph::new(vec![Line::default(), Line::from(vec![Span::raw(format!("{:X?}", app.chip_state.decode_opcode()))])])
         .block(Block::default().title("Disassembly").borders(Borders::RIGHT).border_type(BorderType::Thick));
     f.render_widget(disassembly, chunks[1]);
 }
 
-fn gen_status_view(app: &App) -> Vec<Spans>{
+fn gen_status_view(app: &App) -> Vec<Line>{
     let mut spans = vec![];
 
     if let Some(failure) = &app.last_failure {
@@ -123,44 +123,44 @@ fn gen_reg_view(state: &Chip8State) -> Vec<Row> {
     vec![Row::new(row1), Row::new(row2)]
 }
 
-fn render_display(state: &Chip8State) -> Vec<Spans> {
+fn render_display(state: &Chip8State) -> Vec<Line> {
     let mut spans = vec![];
     for y in 0..32 {
         let mut inner_spans = vec![];
         for x in 0..64 {
             inner_spans.push(if state.framebuffer[(8 * y) + (x / 8)] & 0x80 >> (x % 8) == 0 {Span::raw(" ")} else {Span::raw("█")});
         }
-        spans.push(Spans::from(inner_spans));
+        spans.push(Line::from(inner_spans));
     }
 
     spans
 }
 
-fn gen_timer_view(state: &Chip8State) -> Vec<Spans> {
+fn gen_timer_view(state: &Chip8State) -> Vec<Line> {
     let mut spans = vec![];
 
     let val = state.dt;
     let input = state.input;
-    spans.push(Spans::from(vec![
+    spans.push(Line::from(vec![
         Span::raw(format!("Input: {input:016b}  Delay Timer: {val:02X?}  "))
     ]));
     let val = state.st;
-    spans.push(Spans::from(vec![
+    spans.push(Line::from(vec![
         Span::raw(format!("Sound Timer: {val:02X?}  "))
     ]));
 
     spans
 }
 
-fn gen_sp_view(state: &Chip8State) -> Vec<Spans> {
+fn gen_sp_view(state: &Chip8State) -> Vec<Line> {
     let mut spans = vec![];
 
     let val = state.sp;
-    spans.push(Spans::from(vec![
+    spans.push(Line::from(vec![
         Span::styled(format!(" SP: {val:02X?}"), style_warn_overrun(val, 64)),
     ]));
     let val = state.pc;
-    spans.push(Spans::from(vec![
+    spans.push(Line::from(vec![
         Span::styled(format!(" PC: {val:03X?}"), style_warn_overrun(val, 4096)),
     ]));
 
