@@ -1,7 +1,7 @@
 use std::{time::Duration, fs::File, io::{self, Read}};
 
 use chip8exe::{Chip8State, chip8_tick, chip8_reset};
-use tui::widgets::{ListState, TableState};
+use ratatui::widgets::{ListState, TableState};
 
 //                           0.5 Hz         1 Hz           5 Hz         10 Hz        100 Hz      1000 Hz    1 MHz
 const DURATIONS: [u64; 7] = [2_000_000_000, 1_000_000_000, 200_000_000, 100_000_000, 10_000_000, 1_000_000, 1000];

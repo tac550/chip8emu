@@ -1,5 +1,5 @@
 use chip8exe::{Reg, Chip8State};
-use tui::{backend::Backend, Frame, layout::{Layout, Constraint, Rect, Direction, Alignment}, widgets::{Block, Borders, Row, Cell, Table, BorderType, Paragraph, ListItem, List}, text::{Spans, Span}, style::{Style, Modifier, Color}};
+use ratatui::{backend::Backend, Frame, layout::{Layout, Constraint, Rect, Direction, Alignment}, widgets::{Block, Borders, Row, Cell, Table, BorderType, Paragraph, ListItem, List}, text::{Spans, Span}, style::{Style, Modifier, Color}};
 
 use crate::app::App;
 

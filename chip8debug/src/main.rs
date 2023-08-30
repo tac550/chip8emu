@@ -5,7 +5,7 @@ use std::{io, time::{Duration, UNIX_EPOCH, SystemTime, SystemTimeError}, env, pa
 
 use app::{App, Failure, TIMER_RATE};
 use crossterm::{self, terminal::{enable_raw_mode, EnterAlternateScreen, disable_raw_mode, LeaveAlternateScreen}, execute, event::{EnableMouseCapture, DisableMouseCapture, Event, KeyCode, KeyModifiers, KeyEventKind, KeyEvent}};
-use tui::{backend::{CrosstermBackend, Backend}, Terminal};
+use ratatui::{backend::{CrosstermBackend, Backend}, Terminal};
 
 fn main() -> io::Result<()> {
     // set up terminal
