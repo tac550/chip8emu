@@ -5,6 +5,9 @@ The main crate is the emulator code itself. The `chip8debug` crate is a terminal
 
 Does not yet emulate the precise timing of any particular machine.
 
+## Debugger
+
+When running the debugger (`chip8debug` crate) pass the path to a chip8 ROM as the first command line argument to load a ROM.
 
 # Building
 
