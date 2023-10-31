@@ -1,9 +1,9 @@
 use chip8exe::{Reg, Chip8State};
-use ratatui::{backend::Backend, Frame, layout::{Layout, Constraint, Rect, Direction, Alignment}, widgets::{Block, Borders, Row, Cell, Table, BorderType, Paragraph, ListItem, List}, text::{Span, Line}, style::{Style, Modifier, Color}};
+use ratatui::{Frame, layout::{Layout, Constraint, Rect, Direction, Alignment}, widgets::{Block, Borders, Row, Cell, Table, BorderType, Paragraph, ListItem, List}, text::{Span, Line}, style::{Style, Modifier, Color}};
 
 use crate::app::App;
 
-pub fn draw<B: Backend>(f: &mut Frame<B>, app: &mut App) {
+pub fn draw(f: &mut Frame, app: &mut App) {
     let chunks = Layout::default()
         .constraints([Constraint::Length(2), Constraint::Min(36), Constraint::Length(4)].as_ref())
         .split(f.size());
@@ -13,14 +13,14 @@ pub fn draw<B: Backend>(f: &mut Frame<B>, app: &mut App) {
     draw_reg_dis(f, app, chunks[2]);
 }
 
-fn draw_status<B: Backend>(f: &mut Frame<B>, app: &App, area: Rect) {
+fn draw_status(f: &mut Frame, app: &App, area: Rect) {
     let top_box = Paragraph::new(gen_status_view(app))
         .alignment(Alignment::Right)
         .block(Block::default().title(shortcuts_view()).borders(Borders::NONE));
     f.render_widget(top_box, area);
 }
 
-fn draw_mem_fb<B: Backend>(f: &mut Frame<B>, app: &mut App, area: Rect) {
+fn draw_mem_fb(f: &mut Frame, app: &mut App, area: Rect) {
     let chunks = Layout::default()
         .constraints(vec![Constraint::Length(10), Constraint::Min(0), Constraint::Length(66)])
         .direction(Direction::Horizontal)
@@ -39,7 +39,7 @@ fn draw_mem_fb<B: Backend>(f: &mut Frame<B>, app: &mut App, area: Rect) {
     draw_display(f, app, chunks[2]);
 }
 
-fn draw_stack<B: Backend>(f: &mut Frame<B>, app: &mut App, area: Rect) {
+fn draw_stack(f: &mut Frame, app: &mut App, area: Rect) {
     let chunks = Layout::default()
         .constraints(vec![Constraint::Min(0), Constraint::Length(3)])
         .direction(Direction::Vertical)
@@ -56,7 +56,7 @@ fn draw_stack<B: Backend>(f: &mut Frame<B>, app: &mut App, area: Rect) {
     f.render_widget(sp_area, chunks[1]);
 }
 
-fn draw_display<B: Backend>(f: &mut Frame<B>, app: &mut App, area: Rect) {
+fn draw_display(f: &mut Frame, app: &mut App, area: Rect) {
     let chunks = Layout::default()
         .constraints(vec![Constraint::Length(34), Constraint::Min(0)])
         .direction(Direction::Vertical)
@@ -72,7 +72,7 @@ fn draw_display<B: Backend>(f: &mut Frame<B>, app: &mut App, area: Rect) {
     f.render_widget(timers, chunks[1]);
 }
 
-fn draw_reg_dis<B: Backend>(f: &mut Frame<B>, app: &mut App, area: Rect) {
+fn draw_reg_dis(f: &mut Frame, app: &mut App, area: Rect) {
     let chunks = Layout::default()
         .constraints(vec![Constraint::Percentage(60), Constraint::Percentage(40)])
         .direction(Direction::Horizontal)
