@@ -28,10 +28,9 @@ fn draw_mem_fb(f: &mut Frame, app: &mut App, area: Rect) {
 
     draw_stack(f, app, chunks[0]);
 
-    let table = Table::new(gen_mem_view(&app.chip_state))
+    let table = Table::new(gen_mem_view(&app.chip_state), [Constraint::Length(4); 16])
         .block(Block::default().title("Memory").borders(Borders::ALL))
         .highlight_style(Style::default().add_modifier(Modifier::BOLD).bg(Color::Cyan))
-        .widths(&[Constraint::Length(4); 16])
         .header(Row::new((0..16).map(|i| Cell::from(format!("xx{i:X?}")))));
     app.memory_state.select(Some(app.mem_row_sel_override.unwrap_or((app.chip_state.pc / 16) as usize)));
     f.render_stateful_widget(table, chunks[1], &mut app.memory_state);
@@ -78,9 +77,8 @@ fn draw_reg_dis(f: &mut Frame, app: &mut App, area: Rect) {
         .direction(Direction::Horizontal)
         .split(area);
 
-    let table = Table::new(gen_reg_view(&app.chip_state))
-        .block(Block::default().title("Registers").borders(Borders::LEFT).border_type(BorderType::Thick))
-        .widths(&[Constraint::Length(4); 17]);
+    let table = Table::new(gen_reg_view(&app.chip_state), [Constraint::Length(4); 17])
+        .block(Block::default().title("Registers").borders(Borders::LEFT).border_type(BorderType::Thick));
     f.render_widget(table, chunks[0]);
 
     let disassembly = Paragraph::new(vec![Line::default(), Line::from(vec![Span::raw(format!("{:X?}", app.chip_state.decode_opcode()))])])
